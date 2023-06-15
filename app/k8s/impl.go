@@ -89,3 +89,16 @@ func (s *service) GetPodStatuses(ctx context.Context, req *PodStatusesReq) (*Pod
 	}
 	return &result, nil
 }
+
+func (s *service) ListServices(ctx context.Context, req *ListServicesReq) ([]string, errors.Err) {
+	resp, err := s.client.CoreV1().Services(req.Namespace).List(ctx, metav1.ListOptions{})
+	//TODO(pagination)
+	if err != nil {
+		return nil, errors.NewInternal(err)
+	}
+	result := make([]string, resp.Size())[:0]
+	for _, service := range resp.Items {
+		result = append(result, service.Name)
+	}
+	return result, nil
+}
