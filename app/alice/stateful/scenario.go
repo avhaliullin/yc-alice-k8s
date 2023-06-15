@@ -11,14 +11,7 @@ type scenario = func(context.Context, *aliceapi.Request) (*aliceapi.Response, er
 
 func (h *Handler) setupScenarios() {
 	h.stateScenarios = map[aliceapi.State]scenario{
-		//aliceapi.StateAddItemReqItem: h.addItemReqItem,
-		//aliceapi.StateAddItemReqList: h.addItemReqList,
-		//aliceapi.StateCreateReqName:  h.createRequireName,
-		//aliceapi.StateDelItemReqList: h.deleteItemReqList,
-		//aliceapi.StateDelItemReqItem: h.deleteItemReqItem,
-		//aliceapi.StateDelReqName:     h.deleteListReqList,
-		//aliceapi.StateDelReqConfirm:  h.deleteListReqConfirm,
-		//aliceapi.StateViewReqName:    h.viewListReqName,
+		//
 	}
 	h.scratchScenarios = []scenario{
 		h.listNamespaces,
@@ -26,5 +19,6 @@ func (h *Handler) setupScenarios() {
 		h.brokenPods,
 		h.listServices,
 		h.listIngresses,
+		h.discoverScenarios,
 	}
 }
