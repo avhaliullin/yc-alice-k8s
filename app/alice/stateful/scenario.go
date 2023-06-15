@@ -21,12 +21,8 @@ func (h *Handler) setupScenarios() {
 		//aliceapi.StateViewReqName:    h.viewListReqName,
 	}
 	h.scratchScenarios = []scenario{
-		//h.viewListFromScratch,
 		h.listNamespaces,
 		h.countPods,
-		//h.createFromScratch,
-		//h.addItemFromScratch,
-		//h.deleteListFromScratch,
-		//h.deleteItemFromScratch,
+		h.brokenPods,
 	}
 }

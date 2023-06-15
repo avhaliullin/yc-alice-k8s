@@ -12,6 +12,7 @@ import (
 type Service interface {
 	ListNamespaces(ctx context.Context, req *ListNamespacesReq) ([]string, errors.Err)
 	CountPods(ctx context.Context, req *CountPodsReq) (int, errors.Err)
+	GetPodStatuses(ctx context.Context, req *PodStatusesReq) (*PodStatusesResp, errors.Err)
 }
 
 type ListNamespacesReq struct {
@@ -19,4 +20,16 @@ type ListNamespacesReq struct {
 
 type CountPodsReq struct {
 	Namespace string
+}
+
+type PodStatusesReq struct {
+	Namespace string
+}
+
+type PodStatusesResp struct {
+	Pending   int
+	Running   int
+	Succeeded int
+	Failed    int
+	Unknown   int
 }
