@@ -63,7 +63,7 @@ func (s *service) CountPods(ctx context.Context, req *CountPodsReq) (int, errors
 		return 0, errors.NewInternal(err)
 	}
 	//TODO(pagination?)
-	return resp.Size(), nil
+	return len(resp.Items), nil
 }
 
 func (s *service) GetPodStatuses(ctx context.Context, req *PodStatusesReq) (*PodStatusesResp, errors.Err) {
@@ -96,7 +96,7 @@ func (s *service) ListServices(ctx context.Context, req *ListServicesReq) ([]str
 	if err != nil {
 		return nil, errors.NewInternal(err)
 	}
-	result := make([]string, resp.Size())[:0]
+	result := make([]string, len(resp.Items))[:0]
 	for _, service := range resp.Items {
 		result = append(result, service.Name)
 	}
@@ -109,7 +109,7 @@ func (s *service) ListIngresses(ctx context.Context, req *ListIngressesReq) ([]s
 	if err != nil {
 		return nil, errors.NewInternal(err)
 	}
-	result := make([]string, resp.Size())[:0]
+	result := make([]string, len(resp.Items))[:0]
 	for _, ingress := range resp.Items {
 		result = append(result, ingress.Name)
 	}

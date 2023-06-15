@@ -20,5 +20,6 @@ func (h *Handler) setupScenarios() {
 		h.listServices,
 		h.listIngresses,
 		h.discoverScenarios,
+		h.easterEggs,
 	}
 }

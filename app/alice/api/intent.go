@@ -8,6 +8,10 @@ type Intents struct {
 	IngressList       *IntentIngressList `json:"ingress_list"`
 	DiscoverScenarios *EmptyObj          `json:"discover_scenarios"`
 
+	EasterDBLaunch  *EmptyObj `json:"easter_db_launch"`
+	EasterWhatIsK8s *EmptyObj `json:"easter_what_is_k8s"`
+	EasterHowTo     *EmptyObj `json:"easter_how_to"`
+
 	Confirm *EmptyObj `json:"YANDEX.CONFIRM"`
 	Cancel  *EmptyObj `json:"cancel"`
 	Reject  *EmptyObj `json:"YANDEX.REJECT"`
