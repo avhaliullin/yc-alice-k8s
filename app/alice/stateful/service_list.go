@@ -37,5 +37,6 @@ func (h *Handler) listServices(ctx context.Context, req *aliceapi.Request) (*ali
 		return respondTextF("В неймспейсе %s нет сервисов", namespace), nil
 	}
 	servicesStr := strings.Join(services, "\n")
+	//TODO(plurals)
 	return respondTextF("В неймспейсе \"%s\" %d сервисов:\n%s", namespace, len(services), servicesStr), nil
 }

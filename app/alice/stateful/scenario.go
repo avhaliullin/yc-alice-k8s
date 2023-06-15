@@ -25,5 +25,6 @@ func (h *Handler) setupScenarios() {
 		h.countPods,
 		h.brokenPods,
 		h.listServices,
+		h.listIngresses,
 	}
 }

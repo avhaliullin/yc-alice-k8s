@@ -102,3 +102,16 @@ func (s *service) ListServices(ctx context.Context, req *ListServicesReq) ([]str
 	}
 	return result, nil
 }
+
+func (s *service) ListIngresses(ctx context.Context, req *ListIngressesReq) ([]string, errors.Err) {
+	resp, err := s.client.NetworkingV1().Ingresses(req.Namespace).List(ctx, metav1.ListOptions{})
+	//TODO(pagination)
+	if err != nil {
+		return nil, errors.NewInternal(err)
+	}
+	result := make([]string, resp.Size())[:0]
+	for _, ingress := range resp.Items {
+		result = append(result, ingress.Name)
+	}
+	return result, nil
+}

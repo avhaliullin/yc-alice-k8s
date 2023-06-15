@@ -5,6 +5,7 @@ type Intents struct {
 	CountPods      *IntentCountPods   `json:"count_pods"`
 	BrokenPods     *IntentBrokenPods  `json:"broken_pods"`
 	ServiceList    *IntentServiceList `json:"service_list"`
+	IngressList    *IntentIngressList `json:"ingress_list"`
 
 	Confirm *EmptyObj `json:"YANDEX.CONFIRM"`
 	Cancel  *EmptyObj `json:"cancel"`
@@ -20,6 +21,10 @@ type IntentBrokenPods struct {
 }
 
 type IntentServiceList struct {
+	Slots NamespaceSlots `json:"slots"`
+}
+
+type IntentIngressList struct {
 	Slots NamespaceSlots `json:"slots"`
 }
 
