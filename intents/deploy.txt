@@ -1,0 +1,14 @@
+root:
+    %lemma
+    (выкати|накати|за диплой|задиплой|запусти диплой|сделай диплой|разверни) образ? $Image? (на $Scale реплик)?
+
+slots:
+    image:
+        source: $Image
+    scale:
+        source: $Scale
+        type: YANDEX.NUMBER
+$Image:
+    .+
+$Scale:
+    $YANDEX.NUMBER

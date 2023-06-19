@@ -8,6 +8,7 @@ import (
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/alice/stateful"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/cloud"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/config"
+	docker_hub "github.com/avhaliullin/yandex-alice-k8s-skill/app/docker-hub"
 	iam_auth "github.com/avhaliullin/yandex-alice-k8s-skill/app/iam-auth"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/k8s"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/log"
@@ -16,13 +17,14 @@ import (
 )
 
 type aliceApp struct {
-	ctx        context.Context
-	logger     *zap.Logger
-	conf       *config.Config
-	sdk        *ycsdk.SDK
-	handler    alice.Handler
-	iamAuth    iam_auth.Service
-	k8sService k8s.Service
+	ctx           context.Context
+	logger        *zap.Logger
+	conf          *config.Config
+	sdk           *ycsdk.SDK
+	handler       alice.Handler
+	iamAuth       iam_auth.Service
+	k8sService    k8s.Service
+	dockerService docker_hub.Service
 }
 
 func (a *aliceApp) GetLogger() *zap.Logger {
@@ -48,6 +50,10 @@ func (a *aliceApp) GetK8sService() k8s.Service {
 	return a.k8sService
 }
 
+func (a *aliceApp) GetDockerService() docker_hub.Service {
+	return a.dockerService
+}
+
 func (a *aliceApp) GetConfig() *config.Config {
 	assertInitialized(a.conf, "conf")
 	return a.conf
@@ -69,6 +75,10 @@ func initAliceApp() (*aliceApp, error) {
 	}
 
 	aliceAppInstance.iamAuth, err = iam_auth.NewMetadata()
+	if err != nil {
+		return nil, err
+	}
+	aliceAppInstance.dockerService, err = docker_hub.NewService(aliceAppInstance)
 	if err != nil {
 		return nil, err
 	}

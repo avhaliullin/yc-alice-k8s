@@ -13,3 +13,11 @@ func (s *Slot) AsString() (string, bool) {
 	value := s.Value.(string)
 	return value, value != ""
 }
+
+func (s *Slot) AsInt() (int, bool) {
+	if s == nil || s.Type != "YANDEX.NUMBER" {
+		return 0, false
+	}
+	value := s.Value.(float64)
+	return int(value), true
+}

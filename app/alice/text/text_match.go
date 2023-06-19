@@ -27,7 +27,7 @@ type MatchCandidates interface {
 }
 
 func BestMatch(text string, candidates MatchCandidates, opts ...MatchOpt) (int, bool) {
-	options := options{minRatio: 0.7}
+	options := options{minRatio: 0.5}
 	for _, opt := range opts {
 		opt(&options)
 	}
@@ -86,5 +86,5 @@ func (m IDListMatcher) TextOf(idx int) string {
 }
 
 func normalize(id string) string {
-	return strings.ToLower(strings.ReplaceAll(id, "-", " "))
+	return strings.ToLower(id)
 }

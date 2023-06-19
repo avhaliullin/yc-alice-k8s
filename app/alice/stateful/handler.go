@@ -2,9 +2,11 @@ package stateful
 
 import (
 	"context"
+	"fmt"
 
 	aliceapi "github.com/avhaliullin/yandex-alice-k8s-skill/app/alice/api"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/alice/cache"
+	docker_hub "github.com/avhaliullin/yandex-alice-k8s-skill/app/docker-hub"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/errors"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/k8s"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/log"
@@ -16,12 +18,14 @@ type Handler struct {
 	stateScenarios   map[aliceapi.State]scenario
 	scratchScenarios []scenario
 	k8sService       k8s.Service
+	dockerService    docker_hub.Service
 }
 
 func NewHandler(deps Deps) (*Handler, error) {
 	h := &Handler{
-		logger:     deps.GetLogger(),
-		k8sService: deps.GetK8sService(),
+		logger:        deps.GetLogger(),
+		k8sService:    deps.GetK8sService(),
+		dockerService: deps.GetDockerService(),
 	}
 	h.setupScenarios()
 	return h, nil
@@ -31,6 +35,7 @@ func (h *Handler) Handle(ctx context.Context, req *aliceapi.Request) (*aliceapi.
 	sessionID := req.Session.SessionID
 	ctx = log.CtxWithLogger(ctx, h.logger.With(zap.String("sessionID", string(sessionID))))
 	ctx = cache.ContextWithCache(ctx)
+	log.Info(ctx, fmt.Sprintf("request: %s", mustToJSON(req)))
 	resp, err := h.handle(ctx, req)
 	if err != nil {
 		return h.reportError(ctx, err)

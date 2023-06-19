@@ -15,6 +15,7 @@ type Service interface {
 	GetPodStatuses(ctx context.Context, req *PodStatusesReq) (*PodStatusesResp, errors.Err)
 	ListServices(ctx context.Context, req *ListServicesReq) ([]string, errors.Err)
 	ListIngresses(ctx context.Context, req *ListIngressesReq) ([]string, errors.Err)
+	Deploy(ctx context.Context, req *DeployReq) errors.Err
 }
 
 type ListNamespacesReq struct {
@@ -42,4 +43,10 @@ type ListServicesReq struct {
 
 type ListIngressesReq struct {
 	Namespace string
+}
+
+type DeployReq struct {
+	Image string
+	Name  string
+	Scale int
 }

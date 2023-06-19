@@ -8,12 +8,15 @@ import (
 	"fmt"
 
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/errors"
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd/api"
 )
+
+const deployNs = "default"
 
 var _ Service = &service{}
 
@@ -115,3 +118,35 @@ func (s *service) ListIngresses(ctx context.Context, req *ListIngressesReq) ([]s
 	}
 	return result, nil
 }
+
+func (s *service) Deploy(ctx context.Context, req *DeployReq) errors.Err {
+	_, err := s.client.AppsV1().Deployments(deployNs).Create(ctx, &appsv1.Deployment{
+		TypeMeta: metav1.TypeMeta{},
+		ObjectMeta: metav1.ObjectMeta{
+			Name: req.Name,
+		},
+		Spec: appsv1.DeploymentSpec{
+			Replicas: int32Ptr(int32(req.Scale)),
+			Template: corev1.PodTemplateSpec{
+				Spec: corev1.PodSpec{
+					Containers: []corev1.Container{
+						{Image: req.Image, Name: req.Name},
+					},
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{"app": req.Name},
+				},
+			},
+			Selector: &metav1.LabelSelector{MatchLabels: map[string]string{
+				"app": req.Name,
+			}},
+		},
+		Status: appsv1.DeploymentStatus{},
+	}, metav1.CreateOptions{})
+	if err != nil {
+		return errors.NewInternal(err)
+	}
+	return nil
+}
+
+func int32Ptr(i int32) *int32 { return &i }

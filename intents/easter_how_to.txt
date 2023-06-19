@@ -1,0 +1,6 @@
+root:
+    %lemma
+    Как в (${K8S}) сделать $Action
+    Как сделать $Action в (${K8S})
+$Action:
+    .+

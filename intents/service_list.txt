@@ -1,0 +1,9 @@
+root:
+    %lemma
+    (какие есть сервисы|какие сервисы есть|перечисли сервисы) в (${NAMESPACE})? $Namespace
+
+slots:
+    namespace:
+        source: $Namespace
+$Namespace:
+    .+

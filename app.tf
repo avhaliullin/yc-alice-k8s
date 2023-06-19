@@ -1,7 +1,22 @@
 locals {
+  known-docker-images = [
+    "nginx",
+    "alpine",
+    "busybox",
+    "ubuntu",
+    "python",
+    "redis",
+    "postgres",
+    "node",
+    "httpd",
+    "mongo",
+    "memcached",
+    "mysql"
+  ]
   app-env-vars = {
-    K8S_HOST = var.k8s-host
-    K8S_CA   = var.k8s-ca
+    K8S_HOST      = var.k8s-host
+    K8S_CA        = var.k8s-ca
+    DOCKER_IMAGES = join(",", local.known-docker-images)
   }
   bucket = "${var.folder-id}-fn-deploy"
 }

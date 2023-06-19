@@ -1,0 +1,9 @@
+root:
+  %lemma
+  (сколько сломанных подов|сколько подов сломано|есть ли сломанные поды) в (${NAMESPACE})? $Namespace
+
+slots:
+  namespace:
+    source: $Namespace
+$Namespace:
+  .+

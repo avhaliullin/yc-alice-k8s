@@ -1,0 +1,9 @@
+root:
+    %lemma
+    (какие есть ингрессы|какие ингрессы есть|перечисли ингрессы) в (${NAMESPACE})? $Namespace
+
+slots:
+    namespace:
+        source: $Namespace
+$Namespace:
+    .+

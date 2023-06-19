@@ -1,0 +1,9 @@
+root:
+    %lemma
+    (сколько подов|посчитай поды) в (${NAMESPACE})? $Namespace
+
+slots:
+    namespace:
+        source: $Namespace
+$Namespace:
+    .+

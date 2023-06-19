@@ -18,6 +18,13 @@ func TestFindIDByName(t *testing.T) {
 		"yandex-system",
 	}
 	requireMatch(t, ids, "Кьюб Паблик", "kube-public")
+
+	ids = []string{
+		"nginx",
+		"mongo",
+		"alpine",
+	}
+	requireMatch(t, ids, "Энджинкс", "nginx")
 }
 
 func requireMatch(t *testing.T, ids []string, name string, expect string) {

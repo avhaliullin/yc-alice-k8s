@@ -8,6 +8,8 @@ type Intents struct {
 	IngressList       *IntentIngressList `json:"ingress_list"`
 	DiscoverScenarios *EmptyObj          `json:"discover_scenarios"`
 
+	Deploy *IntentDeploy `json:"deploy"`
+
 	EasterDBLaunch  *EmptyObj `json:"easter_db_launch"`
 	EasterWhatIsK8s *EmptyObj `json:"easter_what_is_k8s"`
 	EasterHowTo     *EmptyObj `json:"easter_how_to"`
@@ -31,6 +33,16 @@ type IntentServiceList struct {
 
 type IntentIngressList struct {
 	Slots NamespaceSlots `json:"slots"`
+}
+
+type IntentDeploy struct {
+	Slots IntentDeploySlots `json:"slots"`
+}
+
+type IntentDeploySlots struct {
+	Image *Slot `json:"image"`
+	Scale *Slot `json:"scale"`
+	Name  *Slot `json:"name"`
 }
 
 type NamespaceSlots struct {
