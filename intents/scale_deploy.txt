@@ -1,0 +1,14 @@
+root:
+    %lemma
+    (заскейли|отскейли|отмасштабируй) (${DEPLOY}) $Name (на|до) $Scale реплик
+
+slots:
+    name:
+        source: $Name
+    scale:
+        source: $Scale
+        type: YANDEX.NUMBER
+$Name:
+    .+
+$Scale:
+    $YANDEX.NUMBER

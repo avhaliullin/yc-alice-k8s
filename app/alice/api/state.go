@@ -10,6 +10,10 @@ const (
 
 	StateDeployStatusReqName      State = "DPLY_ST_REQ_NAME"
 	StateDeployStatusReqNamespace State = "DPLY_ST_REQ_NMSPC"
+
+	StateScaleDeployReqName    State = "SCL_DPLY_REQ_NAME"
+	StateScaleDeployReqScale   State = "SCL_DPLY_REQ_SCALE"
+	StateScaleDeployReqConfirm State = "SCL_DPLY_REQ_CNFRM"
 )
 
 type StateData struct {

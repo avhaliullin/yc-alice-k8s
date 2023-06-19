@@ -16,6 +16,9 @@ func (h *Handler) setupScenarios() {
 		aliceapi.StateDeployConfirm:            h.deployReqConfirm,
 		aliceapi.StateDeployStatusReqName:      h.deployStatusReqName,
 		aliceapi.StateDeployStatusReqNamespace: h.deployStatusReqNamespace,
+		aliceapi.StateScaleDeployReqName:       h.scaleDeployReqName,
+		aliceapi.StateScaleDeployReqScale:      h.scaleDeployReqScale,
+		aliceapi.StateScaleDeployReqConfirm:    h.scaleDeployReqConfirm,
 	}
 	h.scratchScenarios = []scenario{
 		h.listNamespaces,
@@ -27,5 +30,6 @@ func (h *Handler) setupScenarios() {
 		h.easterEggs,
 		h.deployFromScratch,
 		h.deployStatusFromScratch,
+		h.scaleDeployFromScratch,
 	}
 }

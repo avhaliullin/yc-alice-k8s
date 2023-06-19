@@ -9,6 +9,7 @@ type Intents struct {
 	DiscoverScenarios *EmptyObj           `json:"discover_scenarios"`
 	DeployStatus      *IntentDeployStatus `json:"deploy_status"`
 	Deploy            *IntentDeploy       `json:"deploy"`
+	ScaleDeploy       *IntentScaleDeploy  `json:"scale_deploy"`
 
 	EasterDBLaunch  *EmptyObj `json:"easter_db_launch"`
 	EasterWhatIsK8s *EmptyObj `json:"easter_what_is_k8s"`
@@ -52,6 +53,15 @@ type IntentDeployStatus struct {
 type IntentDeployStatusSlots struct {
 	Name      *Slot `json:"name"`
 	Namespace *Slot `json:"namespace"`
+}
+
+type IntentScaleDeploy struct {
+	Slots IntentScaleDeploySlots `json:"slots"`
+}
+
+type IntentScaleDeploySlots struct {
+	Name  *Slot `json:"name"`
+	Scale *Slot `json:"scale"`
 }
 
 type NamespaceSlots struct {

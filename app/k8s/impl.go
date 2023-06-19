@@ -24,6 +24,20 @@ type service struct {
 	client *kubernetes.Clientset
 }
 
+func (s *service) ScaleDeployment(ctx context.Context, req *ScaleDeployReq) errors.Err {
+	deployments := s.client.AppsV1().Deployments(deployNs)
+	scale, err := deployments.GetScale(ctx, req.Name, metav1.GetOptions{})
+	if err != nil {
+		return errors.NewInternal(err)
+	}
+	scale.Spec.Replicas = int32(req.Scale)
+	_, err = s.client.AppsV1().Deployments(deployNs).UpdateScale(ctx, req.Name, scale, metav1.UpdateOptions{})
+	if err != nil {
+		return errors.NewInternal(err)
+	}
+	return nil
+}
+
 func (s *service) ListDeployments(ctx context.Context, req *ListDeploymentsReq) ([]appsv1.Deployment, errors.Err) {
 	resp, err := s.client.AppsV1().Deployments(req.Namespace).List(ctx, metav1.ListOptions{})
 	if err != nil {

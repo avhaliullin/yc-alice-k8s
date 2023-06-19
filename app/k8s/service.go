@@ -18,6 +18,7 @@ type Service interface {
 	ListIngresses(ctx context.Context, req *ListIngressesReq) ([]string, errors.Err)
 	Deploy(ctx context.Context, req *DeployReq) errors.Err
 	ListDeployments(ctx context.Context, req *ListDeploymentsReq) ([]appsv1.Deployment, errors.Err)
+	ScaleDeployment(ctx context.Context, req *ScaleDeployReq) errors.Err
 }
 
 type ListNamespacesReq struct {
@@ -60,4 +61,9 @@ type DeployStatusReq struct {
 
 type ListDeploymentsReq struct {
 	Namespace string
+}
+
+type ScaleDeployReq struct {
+	Name  string
+	Scale int
 }

@@ -44,8 +44,9 @@ type Req struct {
 }
 
 type NLU struct {
-	Tokens  []string `json:"tokens"`
-	Intents Intents  `json:"intents"`
+	Tokens   []string `json:"tokens"`
+	Intents  Intents  `json:"intents"`
+	Entities []Slot   `json:"entities"`
 }
 
 type TokensRef struct {
