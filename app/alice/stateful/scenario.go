@@ -19,6 +19,8 @@ func (h *Handler) setupScenarios() {
 		aliceapi.StateScaleDeployReqName:       h.scaleDeployReqName,
 		aliceapi.StateScaleDeployReqScale:      h.scaleDeployReqScale,
 		aliceapi.StateScaleDeployReqConfirm:    h.scaleDeployReqConfirm,
+		aliceapi.StateDeleteDeployReqName:      h.deleteDeployReqName,
+		aliceapi.StateDeleteDeployReqConfirm:   h.deleteDeployReqConfirm,
 	}
 	h.scratchScenarios = []scenario{
 		h.listNamespaces,
@@ -31,5 +33,6 @@ func (h *Handler) setupScenarios() {
 		h.deployFromScratch,
 		h.deployStatusFromScratch,
 		h.scaleDeployFromScratch,
+		h.deleteDeployFromScratch,
 	}
 }

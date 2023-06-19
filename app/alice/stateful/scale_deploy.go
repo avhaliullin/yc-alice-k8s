@@ -12,23 +12,26 @@ import (
 )
 
 type scaleDeployAction struct {
-	scale     int
-	name      string
-	confirmed bool
+	scale        int
+	name         string
+	deploymentID string
+	confirmed    bool
 }
 
 func scaleDeployActionFromState(state *aliceapi.StateData) *scaleDeployAction {
 	return &scaleDeployAction{
-		scale: state.Scale,
-		name:  state.Name,
+		scale:        state.Scale,
+		name:         state.DeployName,
+		deploymentID: state.DeployID,
 	}
 }
 
 func (da *scaleDeployAction) toState(state aliceapi.State) *aliceapi.StateData {
 	return &aliceapi.StateData{
-		State: state,
-		Scale: da.scale,
-		Name:  da.name,
+		State:      state,
+		Scale:      da.scale,
+		DeployName: da.name,
+		DeployID:   da.deploymentID,
 	}
 }
 
@@ -118,6 +121,16 @@ func (h *Handler) doScaleDeploy(ctx context.Context, action *scaleDeployAction) 
 			State:    action.toState(aliceapi.StateScaleDeployReqName),
 		}, nil
 	}
+	if action.deploymentID == "" {
+		deployment, err := h.findDeploymentByName(ctx, k8s.DefaultNS, action.name)
+		if err != nil {
+			return nil, err
+		}
+		if deployment == nil {
+			return respondTextF("Я не нашла депл+оймент %s", action.name), nil
+		}
+		action.deploymentID = deployment.Name
+	}
 	if !action.confirmed {
 		//TODO(plurals)
 		return &aliceapi.Response{
@@ -129,7 +142,7 @@ func (h *Handler) doScaleDeploy(ctx context.Context, action *scaleDeployAction) 
 		}, nil
 	}
 	err := h.k8sService.ScaleDeployment(ctx, &k8s.ScaleDeployReq{
-		Name:  ru2id(action.name),
+		Name:  action.deploymentID,
 		Scale: action.scale,
 	})
 	if err != nil {

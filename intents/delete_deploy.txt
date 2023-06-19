@@ -1,0 +1,9 @@
+root:
+    %lemma
+    удали (${DEPLOY}) $Name
+
+slots:
+    name:
+        source: $Name
+$Name:
+    .+

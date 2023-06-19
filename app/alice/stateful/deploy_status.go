@@ -15,7 +15,7 @@ type deployStatusAction struct {
 
 func deployStatusActionFromState(state *aliceapi.StateData) *deployStatusAction {
 	return &deployStatusAction{
-		name:        state.Name,
+		name:        state.DeployName,
 		namespace:   state.Namespace,
 		namespaceID: state.NamespaceID,
 	}
@@ -24,7 +24,7 @@ func deployStatusActionFromState(state *aliceapi.StateData) *deployStatusAction 
 func (dsa *deployStatusAction) toState(state aliceapi.State) *aliceapi.StateData {
 	return &aliceapi.StateData{
 		State:       state,
-		Name:        dsa.name,
+		DeployName:  dsa.name,
 		Namespace:   dsa.namespace,
 		NamespaceID: dsa.namespaceID,
 	}

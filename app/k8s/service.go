@@ -19,6 +19,7 @@ type Service interface {
 	Deploy(ctx context.Context, req *DeployReq) errors.Err
 	ListDeployments(ctx context.Context, req *ListDeploymentsReq) ([]appsv1.Deployment, errors.Err)
 	ScaleDeployment(ctx context.Context, req *ScaleDeployReq) errors.Err
+	DeleteDeployment(ctx context.Context, req *DeleteDeployReq) errors.Err
 }
 
 type ListNamespacesReq struct {
@@ -66,4 +67,8 @@ type ListDeploymentsReq struct {
 type ScaleDeployReq struct {
 	Name  string
 	Scale int
+}
+
+type DeleteDeployReq struct {
+	Name string
 }

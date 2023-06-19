@@ -10,6 +10,7 @@ type Intents struct {
 	DeployStatus      *IntentDeployStatus `json:"deploy_status"`
 	Deploy            *IntentDeploy       `json:"deploy"`
 	ScaleDeploy       *IntentScaleDeploy  `json:"scale_deploy"`
+	DeleteDeploy      *IntentDeleteDeploy `json:"delete_deploy"`
 
 	EasterDBLaunch  *EmptyObj `json:"easter_db_launch"`
 	EasterWhatIsK8s *EmptyObj `json:"easter_what_is_k8s"`
@@ -47,12 +48,7 @@ type IntentDeploySlots struct {
 }
 
 type IntentDeployStatus struct {
-	Slots IntentDeployStatusSlots `json:"slots"`
-}
-
-type IntentDeployStatusSlots struct {
-	Name      *Slot `json:"name"`
-	Namespace *Slot `json:"namespace"`
+	Slots DeployInNamespaceSlots `json:"slots"`
 }
 
 type IntentScaleDeploy struct {
@@ -62,6 +58,19 @@ type IntentScaleDeploy struct {
 type IntentScaleDeploySlots struct {
 	Name  *Slot `json:"name"`
 	Scale *Slot `json:"scale"`
+}
+
+type IntentDeleteDeploy struct {
+	Slots DeployInDefaultNSSLots `json:"slots"`
+}
+
+type DeployInDefaultNSSLots struct {
+	Name *Slot `json:"name"`
+}
+
+type DeployInNamespaceSlots struct {
+	Name      *Slot `json:"name"`
+	Namespace *Slot `json:"namespace"`
 }
 
 type NamespaceSlots struct {

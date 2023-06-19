@@ -26,17 +26,17 @@ func deployActionFromState(state *aliceapi.StateData) *deployAction {
 		imageText: state.Image,
 		image:     state.ImageID,
 		scale:     state.Scale,
-		name:      state.Name,
+		name:      state.DeployName,
 	}
 }
 
 func (da *deployAction) toState(state aliceapi.State) *aliceapi.StateData {
 	return &aliceapi.StateData{
-		State:   state,
-		Image:   da.imageText,
-		ImageID: da.image,
-		Scale:   da.scale,
-		Name:    da.name,
+		State:      state,
+		Image:      da.imageText,
+		ImageID:    da.image,
+		Scale:      da.scale,
+		DeployName: da.name,
 	}
 }
 

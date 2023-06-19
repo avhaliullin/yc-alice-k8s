@@ -16,7 +16,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd/api"
 )
 
-const deployNs = "default"
+const DefaultNS = "default"
 
 var _ Service = &service{}
 
@@ -24,14 +24,22 @@ type service struct {
 	client *kubernetes.Clientset
 }
 
+func (s *service) DeleteDeployment(ctx context.Context, req *DeleteDeployReq) errors.Err {
+	err := s.client.AppsV1().Deployments(DefaultNS).Delete(ctx, req.Name, metav1.DeleteOptions{})
+	if err != nil {
+		return errors.NewInternal(err)
+	}
+	return nil
+}
+
 func (s *service) ScaleDeployment(ctx context.Context, req *ScaleDeployReq) errors.Err {
-	deployments := s.client.AppsV1().Deployments(deployNs)
+	deployments := s.client.AppsV1().Deployments(DefaultNS)
 	scale, err := deployments.GetScale(ctx, req.Name, metav1.GetOptions{})
 	if err != nil {
 		return errors.NewInternal(err)
 	}
 	scale.Spec.Replicas = int32(req.Scale)
-	_, err = s.client.AppsV1().Deployments(deployNs).UpdateScale(ctx, req.Name, scale, metav1.UpdateOptions{})
+	_, err = s.client.AppsV1().Deployments(DefaultNS).UpdateScale(ctx, req.Name, scale, metav1.UpdateOptions{})
 	if err != nil {
 		return errors.NewInternal(err)
 	}
@@ -143,7 +151,7 @@ func (s *service) ListIngresses(ctx context.Context, req *ListIngressesReq) ([]s
 }
 
 func (s *service) Deploy(ctx context.Context, req *DeployReq) errors.Err {
-	_, err := s.client.AppsV1().Deployments(deployNs).Create(ctx, &appsv1.Deployment{
+	_, err := s.client.AppsV1().Deployments(DefaultNS).Create(ctx, &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{},
 		ObjectMeta: metav1.ObjectMeta{
 			Name: req.Name,
