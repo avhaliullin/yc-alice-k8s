@@ -4,18 +4,22 @@ import (
 	"context"
 
 	aliceapi "github.com/avhaliullin/yandex-alice-k8s-skill/app/alice/api"
+	"github.com/avhaliullin/yandex-alice-k8s-skill/app/alice/text/resp"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/errors"
+	"github.com/avhaliullin/yandex-alice-k8s-skill/app/k8s"
 )
 
 type deployStatusAction struct {
-	name        string
+	deployName  string
+	deployID    string
 	namespace   string
 	namespaceID string
 }
 
 func deployStatusActionFromState(state *aliceapi.StateData) *deployStatusAction {
 	return &deployStatusAction{
-		name:        state.DeployName,
+		deployName:  state.DeployName,
+		deployID:    state.DeployID,
 		namespace:   state.Namespace,
 		namespaceID: state.NamespaceID,
 	}
@@ -24,7 +28,8 @@ func deployStatusActionFromState(state *aliceapi.StateData) *deployStatusAction 
 func (dsa *deployStatusAction) toState(state aliceapi.State) *aliceapi.StateData {
 	return &aliceapi.StateData{
 		State:       state,
-		DeployName:  dsa.name,
+		DeployName:  dsa.deployName,
+		DeployID:    dsa.deployID,
 		Namespace:   dsa.namespace,
 		NamespaceID: dsa.namespaceID,
 	}
@@ -42,7 +47,7 @@ func (h *Handler) deployStatusFromScratch(ctx context.Context, req *aliceapi.Req
 	var action deployStatusAction
 	name, ok := intnt.Slots.Name.AsString()
 	if ok {
-		action.name = name
+		action.deployName = name
 	}
 	namespace, ok := intnt.Slots.Namespace.AsString()
 	if ok {
@@ -65,16 +70,28 @@ func (h *Handler) deployStatusReqName(ctx context.Context, req *aliceapi.Request
 		return nil, nil
 	}
 	action := deployStatusActionFromState(&req.State.Session)
-	action.name = req.Request.OriginalUtterance
+	action.deployName = req.Request.OriginalUtterance
 	return h.doDeployStatus(ctx, action)
 }
 
 func (h *Handler) doDeployStatus(ctx context.Context, action *deployStatusAction) (*aliceapi.Response, errors.Err) {
 	if action.namespace == "" {
-		return &aliceapi.Response{
-			Response: respWithTTS("В каком неймсп+ейсе проверить депл+ой?"),
-			State:    action.toState(aliceapi.StateDeployStatusReqNamespace),
-		}, nil
+		if action.deployName != "" {
+			// Try in default namespace
+			deploy, err := h.findDeploymentByName(ctx, k8s.DefaultNS, action.deployName)
+			if err != nil {
+				return nil, err
+			}
+			if deploy != nil {
+				return resp.DeployReplicaStatuses(
+					deploy.Name,
+					int(deploy.Status.AvailableReplicas),
+					int(deploy.Status.UnavailableReplicas),
+				), nil
+			}
+		}
+		return resp.AskNSForDeployStatus().
+			WithState(action.toState(aliceapi.StateDeployStatusReqNamespace)), nil
 	}
 	if action.namespaceID == "" {
 		namespaceID, err := h.findNamespaceByName(ctx, action.namespace)
@@ -82,35 +99,40 @@ func (h *Handler) doDeployStatus(ctx context.Context, action *deployStatusAction
 			return nil, err
 		}
 		if namespaceID == "" {
-			respondTextF("я не нашла неймсп+ейс %s", action.namespace)
+			return resp.NSNotFound(action.namespace), nil
 		}
 		action.namespaceID = namespaceID
 	}
-	if action.name == "" {
-		return &aliceapi.Response{
-			Response: respWithTTS("Как называется депл+ой?"),
-			State:    action.toState(aliceapi.StateDeployStatusReqName),
-		}, nil
+	if action.deployName == "" {
+		deployments, err := h.k8sService.ListDeployments(ctx, &k8s.ListDeploymentsReq{Namespace: action.namespaceID})
+		if err != nil {
+			return nil, err
+		}
+		if len(deployments) == 0 {
+			return resp.NoDeploymentsInNS(action.namespaceID), nil
+		} else if len(deployments) == 1 {
+			action.deployName = deployments[0].Name
+			action.deployID = action.deployName
+		} else {
+			var deplNames []string
+			for _, deploy := range deployments {
+				deplNames = append(deplNames, deploy.Name)
+			}
+			return resp.DeployNameForStatus(deplNames).
+				WithState(action.toState(aliceapi.StateDeployStatusReqName)), nil
+		}
 	}
-	deploy, err := h.findDeploymentByName(ctx, action.namespaceID, action.name)
+	deploy, err := h.findDeploymentByName(ctx, action.namespaceID, action.deployName)
 	if err != nil {
 		return nil, err
 	}
 	if deploy == nil {
-		return respondTextF("я не нашла депл+ой %s в неймсп+ейсе %s", action.name, action.namespaceID), nil
+		return resp.DeployNotFoundInNS(action.namespaceID, action.deployName), nil
 	}
 
-	//TODO(plurals)
-	if deploy.Status.UnavailableReplicas > 0 {
-		return respondTextF("в депл+ое %s доступно %d реплик, еще %d в статусе анав+ейлабл",
-			deploy.Name,
-			deploy.Status.AvailableReplicas,
-			deploy.Status.UnavailableReplicas,
-		), nil
-	} else {
-		return respondTextF("все %d реплик в деплое %s запущены",
-			deploy.Status.AvailableReplicas,
-			deploy.Name,
-		), nil
-	}
+	return resp.DeployReplicaStatuses(
+		deploy.Name,
+		int(deploy.Status.AvailableReplicas),
+		int(deploy.Status.UnavailableReplicas),
+	), nil
 }

@@ -2,9 +2,9 @@ package stateful
 
 import (
 	"context"
-	"strings"
 
 	aliceapi "github.com/avhaliullin/yandex-alice-k8s-skill/app/alice/api"
+	"github.com/avhaliullin/yandex-alice-k8s-skill/app/alice/text/resp"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/errors"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/k8s"
 )
@@ -20,23 +20,18 @@ func (h *Handler) listIngresses(ctx context.Context, req *aliceapi.Request) (*al
 
 	namespaceName, ok := intnt.Slots.Namespace.AsString()
 	if !ok {
-		return respondText("В каком неймспейсе найти ингрессы?"), nil
+		return resp.AskNSForIngresses(), nil
 	}
 	namespace, err := h.findNamespaceByName(ctx, namespaceName)
 	if err != nil {
 		return nil, err
 	}
 	if namespace == "" {
-		return respondTextF("Я не нашла неймспейс \"%s\"", namespaceName), nil
+		return resp.NSNotFound(namespaceName), nil
 	}
 	ingresses, err := h.k8sService.ListIngresses(ctx, &k8s.ListIngressesReq{Namespace: namespace})
 	if err != nil {
 		return nil, err
 	}
-	if len(ingresses) == 0 {
-		return respondTextF("В неймспейсе %s нет ингрессов", namespace), nil
-	}
-	servicesStr := strings.Join(ingresses, "\n")
-	//TODO(plurals)
-	return respondTextF("В неймспейсе \"%s\" %d ингрессов:\n%s", namespace, len(ingresses), servicesStr), nil
+	return resp.ListIngresses(namespace, ingresses), nil
 }

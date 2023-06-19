@@ -1,4 +1,4 @@
 root:
     %lemma
-    (покажи|перечисли) (все)? (мои)? (${NAMESPACE})
-    список (${NAMESPACE})
+    (покажи|перечисли) (все)? (мои)? (${NAMESPACE_PLUR})
+    список (${NAMESPACE_GEN_PLUR})

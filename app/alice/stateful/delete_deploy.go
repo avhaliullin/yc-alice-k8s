@@ -2,9 +2,9 @@ package stateful
 
 import (
 	"context"
-	"fmt"
 
 	aliceapi "github.com/avhaliullin/yandex-alice-k8s-skill/app/alice/api"
+	"github.com/avhaliullin/yandex-alice-k8s-skill/app/alice/text/resp"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/errors"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/k8s"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/log"
@@ -64,7 +64,7 @@ func (h *Handler) deleteDeployReqConfirm(ctx context.Context, req *aliceapi.Requ
 	}
 	if req.Request.NLU.Intents.Confirm == nil {
 		if req.Request.NLU.Intents.Reject != nil {
-			return respondText("тогда давайте попробуем заново"), nil
+			return resp.RejectOnWizard(), nil
 		}
 		return nil, nil
 	}
@@ -75,10 +75,8 @@ func (h *Handler) deleteDeployReqConfirm(ctx context.Context, req *aliceapi.Requ
 
 func (h *Handler) doDeleteDeploy(ctx context.Context, action *deleteDeployAction) (*aliceapi.Response, errors.Err) {
 	if action.name == "" {
-		return &aliceapi.Response{
-			Response: &aliceapi.Resp{Text: "какой депл+ой удалить?"},
-			State:    action.toState(aliceapi.StateDeleteDeployReqName),
-		}, nil
+		return resp.WhichDeployToDelete().
+			WithState(action.toState(aliceapi.StateDeleteDeployReqName)), nil
 	}
 	if action.deploymentID == "" {
 		deployment, err := h.findDeploymentByName(ctx, k8s.DefaultNS, action.name)
@@ -86,24 +84,18 @@ func (h *Handler) doDeleteDeploy(ctx context.Context, action *deleteDeployAction
 			return nil, err
 		}
 		if deployment == nil {
-			return respondTextF("Я не нашла депл+оймент %s", action.name), nil
+			return resp.DeployNotFound(action.name), nil
 		}
 		action.deploymentID = deployment.Name
 	}
 	if !action.confirmed {
-		//TODO(plurals)
-		return &aliceapi.Response{
-			Response: respWithTTS(fmt.Sprintf(
-				"Удаляю деплой %s. Все верно?",
-				action.name,
-			)),
-			State: action.toState(aliceapi.StateDeleteDeployReqConfirm),
-		}, nil
+		return resp.ConfirmDeletingDeploy(action.name).
+			WithState(action.toState(aliceapi.StateDeleteDeployReqConfirm)), nil
 	}
 	err := h.k8sService.DeleteDeployment(ctx, &k8s.DeleteDeployReq{Name: action.deploymentID})
 	if err != nil {
 		log.Error(ctx, "deploy scaling failed", zap.Error(err))
-		return respondText("не получилось удалить деплой"), nil
+		return resp.DeployDeletionFailed(action.deploymentID), nil
 	}
-	return respondText("деплой удален"), nil
+	return resp.DeployDeleted(action.deploymentID), nil
 }

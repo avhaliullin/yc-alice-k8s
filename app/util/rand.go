@@ -15,3 +15,7 @@ func GenerateID() string {
 	lo := rand.Uint32()
 	return fmt.Sprintf("%x%x", hi, lo)
 }
+
+func RandomInt(until int) int {
+	return int(rand.Int31n(int32(until)))
+}

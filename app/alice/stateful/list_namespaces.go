@@ -2,9 +2,9 @@ package stateful
 
 import (
 	"context"
-	"fmt"
 
 	aliceapi "github.com/avhaliullin/yandex-alice-k8s-skill/app/alice/api"
+	"github.com/avhaliullin/yandex-alice-k8s-skill/app/alice/text/resp"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/errors"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/k8s"
 )
@@ -21,12 +21,9 @@ func (h *Handler) listNamespaces(ctx context.Context, req *aliceapi.Request) (*a
 	if err != nil {
 		return nil, err
 	}
-	if len(nss) == 0 {
-		return respondText("неймспейсы не найдены"), nil
-	}
-	text := "Я нашла такие неймспейсы:\n"
+	var nsNames []string
 	for _, ns := range nss {
-		text = text + fmt.Sprintf("%s\n", ns)
+		nsNames = append(nsNames, ns)
 	}
-	return respondText(text), nil
+	return resp.ListNSs(nsNames), nil
 }

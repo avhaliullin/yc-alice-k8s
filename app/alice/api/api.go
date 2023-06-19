@@ -75,6 +75,11 @@ type Response struct {
 	State               *StateData `json:"session_state"`
 }
 
+func (r *Response) WithState(s *StateData) *Response {
+	r.State = s
+	return r
+}
+
 type ButtonPayload struct {
 	//ChooseListID   model.TODOListID `json:"choose_list_id,omitempty"`
 	ChooseListName string `json:"choose_list_name,omitempty"`

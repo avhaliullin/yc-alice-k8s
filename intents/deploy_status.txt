@@ -1,6 +1,6 @@
 root:
     %lemma
-    (дай|какой|расскажи) статус (${DEPLOY}) $Name в (${NAMESPACE}) $Namespace
+    (дай|какой|расскажи) статус (${DEPLOY_GEN}) ($Name|в (${NAMESPACE_ADPOS}) $Namespace)?
 
 slots:
     name:

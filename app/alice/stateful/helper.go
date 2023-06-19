@@ -2,10 +2,8 @@ package stateful
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
-	aliceapi "github.com/avhaliullin/yandex-alice-k8s-skill/app/alice/api"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/alice/text"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/errors"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/k8s"
@@ -13,21 +11,6 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/util/json"
 )
-
-const maxButtons = 5
-
-func respWithTTS(msg string) *aliceapi.Resp {
-	tts := msg
-	txt := strings.ReplaceAll(msg, "+", "")
-	return &aliceapi.Resp{Text: txt, TTS: tts}
-}
-func respondText(msg string) *aliceapi.Response {
-	return &aliceapi.Response{Response: respWithTTS(msg)}
-}
-
-func respondTextF(msg string, args ...any) *aliceapi.Response {
-	return respondText(fmt.Sprintf(msg, args...))
-}
 
 func (h *Handler) findNamespaceByName(ctx context.Context, nsName string) (string, errors.Err) {
 	nss, err := h.k8sService.ListNamespaces(ctx, &k8s.ListNamespacesReq{})
@@ -60,8 +43,7 @@ func (h *Handler) findDeploymentByName(ctx context.Context, namespace string, de
 	if err != nil {
 		return nil, err
 	}
-
-	result, ok := text.BestMatch(deployName, text.DeploymentsMatcher(deployments))
+	result, ok := text.BestMatch(ru2id(deployName), text.DeploymentsMatcher(deployments))
 	if !ok {
 		return nil, nil
 	}

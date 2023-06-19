@@ -28,7 +28,7 @@ type MatchCandidates interface {
 }
 
 func BestMatch(text string, candidates MatchCandidates, opts ...MatchOpt) (int, bool) {
-	options := options{minRatio: 0.5}
+	options := options{minRatio: 0.7}
 	for _, opt := range opts {
 		opt(&options)
 	}

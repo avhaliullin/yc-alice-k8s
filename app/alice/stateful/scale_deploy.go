@@ -2,9 +2,9 @@ package stateful
 
 import (
 	"context"
-	"fmt"
 
 	aliceapi "github.com/avhaliullin/yandex-alice-k8s-skill/app/alice/api"
+	"github.com/avhaliullin/yandex-alice-k8s-skill/app/alice/text/resp"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/errors"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/k8s"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/log"
@@ -49,11 +49,10 @@ func (h *Handler) scaleDeployFromScratch(ctx context.Context, req *aliceapi.Requ
 	if ok {
 		action.scale = scale
 		if scale <= 0 {
-			return respondText("не могу задепл+оить меньше одной реплики"), nil
+			return resp.DeployScaleMinAssert(), nil
 		}
 		if scale > maxScale {
-			//TODO(plurals)
-			return respondTextF("я депл+ою не больше %d реплик", maxScale), nil
+			return resp.DeployScaleMaxAssert(maxScale), nil
 		}
 	}
 	name, ok := intnt.Slots.Name.AsString()
@@ -86,14 +85,13 @@ func (h *Handler) scaleDeployReqScale(ctx context.Context, req *aliceapi.Request
 		}
 	}
 	if !ok {
-		return respondText("я вас не поняла, давайте попробуем еще раз"), nil
+		return resp.ExpectedNumber(), nil
 	}
 	if scale <= 0 {
-		return respondText("не могу задепл+оить меньше одной реплики"), nil
+		return resp.DeployScaleMinAssert(), nil
 	}
 	if scale > maxScale {
-		//TODO(plurals)
-		return respondTextF("я депл+ою не больше %d реплик", maxScale), nil
+		return resp.DeployScaleMaxAssert(maxScale), nil
 	}
 	action.scale = scale
 	return h.doScaleDeploy(ctx, action)
@@ -105,7 +103,7 @@ func (h *Handler) scaleDeployReqConfirm(ctx context.Context, req *aliceapi.Reque
 	}
 	if req.Request.NLU.Intents.Confirm == nil {
 		if req.Request.NLU.Intents.Reject != nil {
-			return respondText("тогда давайте попробуем заново"), nil
+			return resp.RejectOnWizard(), nil
 		}
 		return nil, nil
 	}
@@ -116,10 +114,8 @@ func (h *Handler) scaleDeployReqConfirm(ctx context.Context, req *aliceapi.Reque
 
 func (h *Handler) doScaleDeploy(ctx context.Context, action *scaleDeployAction) (*aliceapi.Response, errors.Err) {
 	if action.name == "" {
-		return &aliceapi.Response{
-			Response: &aliceapi.Resp{Text: "какой депл+ой отскейлить?"},
-			State:    action.toState(aliceapi.StateScaleDeployReqName),
-		}, nil
+		return resp.WhichDeployToScale().
+			WithState(action.toState(aliceapi.StateScaleDeployReqName)), nil
 	}
 	if action.deploymentID == "" {
 		deployment, err := h.findDeploymentByName(ctx, k8s.DefaultNS, action.name)
@@ -127,19 +123,13 @@ func (h *Handler) doScaleDeploy(ctx context.Context, action *scaleDeployAction) 
 			return nil, err
 		}
 		if deployment == nil {
-			return respondTextF("Я не нашла депл+оймент %s", action.name), nil
+			return resp.DeployNotFound(action.name), nil
 		}
 		action.deploymentID = deployment.Name
 	}
 	if !action.confirmed {
-		//TODO(plurals)
-		return &aliceapi.Response{
-			Response: respWithTTS(fmt.Sprintf(
-				"Масштабирую деплой %s до %d реплик. Все верно?",
-				action.name, action.scale,
-			)),
-			State: action.toState(aliceapi.StateScaleDeployReqConfirm),
-		}, nil
+		return resp.DeployScalingConfirm(action.name, action.scale).
+			WithState(action.toState(aliceapi.StateScaleDeployReqConfirm)), nil
 	}
 	err := h.k8sService.ScaleDeployment(ctx, &k8s.ScaleDeployReq{
 		Name:  action.deploymentID,
@@ -147,7 +137,7 @@ func (h *Handler) doScaleDeploy(ctx context.Context, action *scaleDeployAction) 
 	})
 	if err != nil {
 		log.Error(ctx, "deploy scaling failed", zap.Error(err))
-		return respondText("не получилось отмасштабировать деплой"), nil
+		return resp.DeployScalingFail(action.deploymentID), nil
 	}
-	return respondText("запустила масштабирование"), nil
+	return resp.DeployScalingSuccess(k8s.DefaultNS, action.deploymentID), nil
 }
