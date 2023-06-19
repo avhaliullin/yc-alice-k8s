@@ -5,6 +5,7 @@ package resp
 
 import (
 	"fmt"
+	"strconv"
 )
 
 func numDependent(num int, conf numDependentConfig) respF {
@@ -20,14 +21,22 @@ type numDependentConfig struct {
 	like5    respF
 }
 
+func nvl(a, b respF) respF {
+	if a != nil {
+		return a
+	} else {
+		return b
+	}
+}
+
 func (p *numDependentConfig) get(num int) respF {
 	switch num {
 	case 0:
-		return p.exactly0
+		return nvl(p.exactly0, p.like5)
 	case 1:
-		return p.exactly1
+		return nvl(p.exactly1, p.like1)
 	case 2:
-		return p.exactly2
+		return nvl(p.exactly2, p.like2)
 	}
 	if num < 0 {
 		num = -num
@@ -49,9 +58,44 @@ func (p *numDependentConfig) get(num int) respF {
 	}
 }
 
-/*
-0, 5, 6, 7, 8, 9, 10, ... 20, 200, 2000 арбузов
-1 арбуз
-2, 3, 4 арбуза
+func number(val int, gCase GramCase, gGender GramGender) string {
+	strVal := strconv.Itoa(val)
+	if gCase == CaseNominative && gGender == GenderM {
+		return strVal
+	}
+	twoDigits := val % 100
+	oneDigit := val % 10
+	if gCase == CaseAccusative && gGender == GenderF {
+		if twoDigits >= 10 && twoDigits < 20 || (oneDigit != 1 && oneDigit != 2) {
+			return strVal
+		}
+		pref := ""
+		if oneDigit != val {
+			pref = strconv.Itoa(val-oneDigit) + " "
+		}
+		switch oneDigit {
+		case 1:
+			return pref + "одну"
+		case 2:
+			return pref + "две"
+		}
+	}
+	return strVal
+}
 
-*/
+type GramCase int
+
+const (
+	// один под
+	CaseNominative GramCase = iota
+	// одного пода
+	CaseAccusative
+)
+
+type GramGender int
+
+const (
+	GenderF GramGender = iota
+	GenderM
+	GenderN
+)

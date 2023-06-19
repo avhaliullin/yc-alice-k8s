@@ -14,19 +14,39 @@ type Deps interface {
 	GetConfig() *config.Config
 }
 type Service interface {
-	ListImages(ctx context.Context) ([]string, errors.Err)
+	ListImages(ctx context.Context) ([]Image, errors.Err)
 }
 
 var _ Service = &service{}
 
 type service struct {
-	images []string
+	images []Image
 }
 
-func (s *service) ListImages(ctx context.Context) ([]string, errors.Err) {
+func (s *service) ListImages(ctx context.Context) ([]Image, errors.Err) {
 	return s.images, nil
 }
 
 func NewService(deps Deps) (Service, error) {
-	return &service{images: deps.GetConfig().DockerImages}, nil
+	var images []Image
+	usedNames := make(map[string]bool)
+	for pron, name := range deps.GetConfig().DockerImages {
+		images = append(images, Image{
+			PronouncedName: pron,
+			Name:           name,
+		})
+		if !usedNames[name] {
+			usedNames[name] = true
+			images = append(images, Image{
+				PronouncedName: name,
+				Name:           name,
+			})
+		}
+	}
+	return &service{images: images}, nil
+}
+
+type Image struct {
+	PronouncedName string
+	Name           string
 }

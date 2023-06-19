@@ -4,6 +4,7 @@ import (
 	"strings"
 	"unicode"
 
+	docker_hub "github.com/avhaliullin/yandex-alice-k8s-skill/app/docker-hub"
 	"github.com/texttheater/golang-levenshtein/levenshtein"
 	appsv1 "k8s.io/api/apps/v1"
 )
@@ -72,6 +73,18 @@ func MatchOptPrefix(prefix string) MatchOpt {
 	return func(o *options) {
 		o.prefix = prefix
 	}
+}
+
+var _ MatchCandidates = ImageListMatcher([]docker_hub.Image{})
+
+type ImageListMatcher []docker_hub.Image
+
+func (m ImageListMatcher) Len() int {
+	return len(m)
+}
+
+func (m ImageListMatcher) TextOf(idx int) string {
+	return m[idx].PronouncedName
 }
 
 var _ MatchCandidates = IDListMatcher([]string{})

@@ -123,10 +123,11 @@ func HowToNameDeploy() *aliceapi.Response {
 }
 
 func ConfirmDeploy(name string, image string, scale int) *aliceapi.Response {
+	scaleNumStr := number(scale, CaseAccusative, GenderF)
 	replicas := numDependent(scale, numDependentConfig{
-		like1: format("%d реплику", scale),
-		like2: format("%d реплики", scale),
-		like5: format("%d реплик", scale),
+		like1: format("%s реплику", scaleNumStr),
+		like2: format("%s реплики", scaleNumStr),
+		like5: format("%s реплик", scaleNumStr),
 	})
 	return randomize(
 		concat(
@@ -284,9 +285,9 @@ func EasterWhatIsK8s() *aliceapi.Response {
 }
 
 func ScenarioDiscovery() *aliceapi.Response {
-	return format("Я умею заглядывать в неймспейсы: " +
-		"считать и искать сломанные поды, " +
-		"могу перечислить сервисы и ингрессы в неймспейсе")()
+	return format("Я умею заглядывать в нэймсп+эйсы: " +
+		"считать и искать сломанные п+оды, " +
+		"могу перечислить сервисы и ингр+эссы в нэймсп+эйсе")()
 }
 
 func NoDeploymentsInNS(ns string) *aliceapi.Response {

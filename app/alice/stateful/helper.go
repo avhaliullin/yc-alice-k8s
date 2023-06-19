@@ -31,11 +31,11 @@ func (h *Handler) findImageByName(ctx context.Context, imageName string) (string
 		return "", err
 	}
 
-	result, ok := findIdByName(imageName, images)
+	result, ok := text.BestMatch(imageName, text.ImageListMatcher(images))
 	if !ok {
 		return "", nil
 	}
-	return result, nil
+	return images[result].Name, nil
 }
 
 func (h *Handler) findDeploymentByName(ctx context.Context, namespace string, deployName string) (*appsv1.Deployment, errors.Err) {

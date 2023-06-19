@@ -10,14 +10,14 @@ import (
 type Config struct {
 	K8sHost      string
 	K8sCA        []byte
-	DockerImages []string
+	DockerImages map[string]string
 }
 
 func LoadFromEnv() *Config {
 	return &Config{
 		K8sHost:      requireString("K8S_HOST"),
 		K8sCA:        requireBytes("K8S_CA"),
-		DockerImages: requireStringList("DOCKER_IMAGES"),
+		DockerImages: requireStringMap("DOCKER_IMAGES"),
 	}
 }
 
@@ -36,6 +36,19 @@ func requireString(name string) string {
 		panic(fmt.Sprintf("required env var %s not found", name))
 	}
 	return res
+}
+
+func requireStringMap(name string) map[string]string {
+	list := requireStringList(name)
+	result := make(map[string]string)
+	for _, value := range list {
+		parts := strings.SplitN(value, ":", 2)
+		if len(parts) != 2 {
+			panic(fmt.Sprintf("expected list of tuples in %s, found: %s", name, value))
+		}
+		result[parts[0]] = parts[1]
+	}
+	return result
 }
 
 func requireStringList(name string) []string {

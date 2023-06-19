@@ -6,13 +6,13 @@ export NAMESPACE_ADPOS="неймспейсе|нейм спейсе|нам спе
 export NAMESPACE_PLUR="неймспейсы|нейм спейсы|нам спейсы|namespace|name space"
 export NAMESPACE_GEN_PLUR="неймспейсов|нейм спейсов|нам спейсов|namespace|name space"
 export K8S="кубернетис|купернетис|кубер|к8с"
-export DEPLOY="деплой|диплой|деплоймент|диплоймент|диплеймент|диплоймант"
-export DEPLOY_GEN="деплоя|диплоя|деплоймента|диплоймента|диплеймента|диплойманта"
-export DEPLOY_ADPOS="деплое|диплое|деплойменте|диплойменте|диплейменте|диплойманте"
+export DEPLOY="деплой|диплой|диплей|деплоймент|диплоймент|диплеймент|диплоймант"
+export DEPLOY_GEN="деплоя|диплоя|диплея|деплоймента|диплоймента|диплеймента|диплойманта"
+export DEPLOY_ADPOS="деплое|диплое|диплее|деплойменте|диплойменте|диплейменте|диплойманте"
 
 mkdir -p "dist"
 
 for file in *.txt
 do
-  cat "$file" | envsubst '${NAMESPACE}${NAMESPACE_GEN}${NAMESPACE_ADPOS}${NAMESPACE_PLUR}${NAMESPACE_GEN_PLUR}${K8S}${DEPLOY_GEN}${DEPLOY_ADPOS}' > "dist/$file"
+  cat "$file" | envsubst '${NAMESPACE}${NAMESPACE_GEN}${NAMESPACE_ADPOS}${NAMESPACE_PLUR}${NAMESPACE_GEN_PLUR}${K8S}${DEPLOY}${DEPLOY_GEN}${DEPLOY_ADPOS}' > "dist/$file"
 done

@@ -1,6 +1,6 @@
 root:
     %lemma
-    удали (${DEPLOY}) $Name
+    удали (${DEPLOY}) $Name?
 
 slots:
     name:

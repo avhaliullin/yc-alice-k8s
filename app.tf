@@ -1,17 +1,20 @@
 locals {
   known-docker-images = [
-    "nginx",
-    "alpine",
-    "busybox",
-    "ubuntu",
-    "python",
-    "redis",
-    "postgres",
-    "node",
-    "httpd",
-    "mongo",
-    "memcached",
-    "mysql"
+    "энджинкс:nginx",
+    "альпайн:alpine",
+    "бизибокс:busybox",
+    "убунту:ubuntu",
+    "питон:python",
+    "пайтон:python",
+    "рэдис:redis",
+    "постгрес:postgres",
+    "посгрес:postgres",
+    "нод:node",
+    "ноджээс:node",
+    "эштитипиди:httpd",
+    "монго:mongo",
+    "мемкэшед:memcached",
+    "майэскуэль:mysql"
   ]
   app-env-vars = {
     K8S_HOST      = var.k8s-host
