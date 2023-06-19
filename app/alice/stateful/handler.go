@@ -52,9 +52,9 @@ func (h *Handler) handle(ctx context.Context, req *aliceapi.Request) (*aliceapi.
 	}
 	if state := req.State.Session; state.State != aliceapi.StateInit {
 		intents := req.Request.NLU.Intents
-		if req.Request.Type == aliceapi.RequestTypeSimple && intents.Cancel != nil || intents.Reject != nil {
+		if req.Request.Type == aliceapi.RequestTypeSimple && intents.Cancel != nil {
 			return &aliceapi.Response{
-				Response: &aliceapi.Resp{Text: "Чем я могу помочь?"},
+				Response: &aliceapi.Resp{Text: "Окей, отменяю. Чем я могу помочь?"},
 			}, nil
 		}
 		scenario, ok := h.stateScenarios[state.State]
