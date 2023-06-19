@@ -23,8 +23,8 @@ type deployAction struct {
 
 func deployActionFromState(state *aliceapi.StateData) *deployAction {
 	return &deployAction{
-		imageText: state.ImageText,
-		image:     state.Image,
+		imageText: state.Image,
+		image:     state.ImageID,
 		scale:     state.Scale,
 		name:      state.Name,
 	}
@@ -32,11 +32,11 @@ func deployActionFromState(state *aliceapi.StateData) *deployAction {
 
 func (da *deployAction) toState(state aliceapi.State) *aliceapi.StateData {
 	return &aliceapi.StateData{
-		State:     state,
-		ImageText: da.imageText,
-		Image:     da.image,
-		Scale:     da.scale,
-		Name:      da.name,
+		State:   state,
+		Image:   da.imageText,
+		ImageID: da.image,
+		Scale:   da.scale,
+		Name:    da.name,
 	}
 }
 

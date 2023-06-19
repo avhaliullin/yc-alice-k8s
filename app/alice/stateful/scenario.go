@@ -11,9 +11,11 @@ type scenario = func(context.Context, *aliceapi.Request) (*aliceapi.Response, er
 
 func (h *Handler) setupScenarios() {
 	h.stateScenarios = map[aliceapi.State]scenario{
-		aliceapi.StateDeployReqName:  h.deployReqName,
-		aliceapi.StateDeployReqImage: h.deployReqImage,
-		aliceapi.StateDeployConfirm:  h.deployReqConfirm,
+		aliceapi.StateDeployReqName:            h.deployReqName,
+		aliceapi.StateDeployReqImage:           h.deployReqImage,
+		aliceapi.StateDeployConfirm:            h.deployReqConfirm,
+		aliceapi.StateDeployStatusReqName:      h.deployStatusReqName,
+		aliceapi.StateDeployStatusReqNamespace: h.deployStatusReqNamespace,
 	}
 	h.scratchScenarios = []scenario{
 		h.listNamespaces,
@@ -24,5 +26,6 @@ func (h *Handler) setupScenarios() {
 		h.discoverScenarios,
 		h.easterEggs,
 		h.deployFromScratch,
+		h.deployStatusFromScratch,
 	}
 }

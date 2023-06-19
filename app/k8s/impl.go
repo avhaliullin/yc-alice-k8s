@@ -24,6 +24,15 @@ type service struct {
 	client *kubernetes.Clientset
 }
 
+func (s *service) ListDeployments(ctx context.Context, req *ListDeploymentsReq) ([]appsv1.Deployment, errors.Err) {
+	resp, err := s.client.AppsV1().Deployments(req.Namespace).List(ctx, metav1.ListOptions{})
+	if err != nil {
+		return nil, errors.NewInternal(err)
+	}
+	//TODO(paging)
+	return resp.Items, nil
+}
+
 func NewService(deps Deps) (Service, error) {
 	err := rest.RegisterAuthProviderPlugin("yciam", authProviderFactory(deps.GetIAMAuth()))
 	if err != nil {

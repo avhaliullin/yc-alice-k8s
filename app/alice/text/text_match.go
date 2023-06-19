@@ -5,6 +5,7 @@ import (
 	"unicode"
 
 	"github.com/texttheater/golang-levenshtein/levenshtein"
+	appsv1 "k8s.io/api/apps/v1"
 )
 
 var levensteinOpts = levenshtein.Options{
@@ -73,7 +74,7 @@ func MatchOptPrefix(prefix string) MatchOpt {
 	}
 }
 
-var _ MatchCandidates = IDListMatcher([]string{""})
+var _ MatchCandidates = IDListMatcher([]string{})
 
 type IDListMatcher []string
 
@@ -83,6 +84,18 @@ func (m IDListMatcher) Len() int {
 
 func (m IDListMatcher) TextOf(idx int) string {
 	return normalize(m[idx])
+}
+
+var _ MatchCandidates = DeploymentsMatcher([]appsv1.Deployment{})
+
+type DeploymentsMatcher []appsv1.Deployment
+
+func (d DeploymentsMatcher) Len() int {
+	return len(d)
+}
+
+func (d DeploymentsMatcher) TextOf(idx int) string {
+	return normalize(d[idx].Name)
 }
 
 func normalize(id string) string {

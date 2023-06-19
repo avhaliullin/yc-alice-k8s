@@ -1,0 +1,13 @@
+root:
+    %lemma
+    (дай|какой|расскажи) статус (деплоя|диплоя|диплоймента|деплоймента) $Name в (${NAMESPACE}) $Namespace
+
+slots:
+    name:
+        source: $Name
+    namespace:
+        source: $Namespace
+$Name:
+    .+
+$Namespace:
+    .+

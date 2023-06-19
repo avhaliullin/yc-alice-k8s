@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/errors"
+	appsv1 "k8s.io/api/apps/v1"
 )
 
 type Service interface {
@@ -16,6 +17,7 @@ type Service interface {
 	ListServices(ctx context.Context, req *ListServicesReq) ([]string, errors.Err)
 	ListIngresses(ctx context.Context, req *ListIngressesReq) ([]string, errors.Err)
 	Deploy(ctx context.Context, req *DeployReq) errors.Err
+	ListDeployments(ctx context.Context, req *ListDeploymentsReq) ([]appsv1.Deployment, errors.Err)
 }
 
 type ListNamespacesReq struct {
@@ -49,4 +51,13 @@ type DeployReq struct {
 	Image string
 	Name  string
 	Scale int
+}
+
+type DeployStatusReq struct {
+	Namespace string
+	DeployID  string
+}
+
+type ListDeploymentsReq struct {
+	Namespace string
 }
