@@ -9,15 +9,17 @@ import (
 
 type Config struct {
 	K8sHost      string
-	K8sCA        []byte
+	K8sCA        string
 	DockerImages map[string]string
+	SAKey        string
 }
 
 func LoadFromEnv() *Config {
 	return &Config{
 		K8sHost:      requireString("K8S_HOST"),
-		K8sCA:        requireBytes("K8S_CA"),
+		K8sCA:        requireString("K8S_CA"),
 		DockerImages: requireStringMap("DOCKER_IMAGES"),
+		SAKey:        os.Getenv("SA_KEY"), //non-required
 	}
 }
 

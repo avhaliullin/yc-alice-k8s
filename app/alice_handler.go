@@ -74,7 +74,7 @@ func initAliceApp() (*aliceApp, error) {
 		return nil, err
 	}
 
-	aliceAppInstance.iamAuth, err = iam_auth.NewMetadata()
+	aliceAppInstance.iamAuth, err = iam_auth.New(aliceAppInstance)
 	if err != nil {
 		return nil, err
 	}

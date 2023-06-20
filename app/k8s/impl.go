@@ -71,7 +71,7 @@ func NewService(deps Deps) (Service, error) {
 			Name: "yciam",
 		},
 		TLSClientConfig: rest.TLSClientConfig{
-			CAData: appConf.K8sCA,
+			CAData: []byte(appConf.K8sCA),
 		},
 	})
 	if err != nil {

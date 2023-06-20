@@ -18,7 +18,6 @@ locals {
   ]
   app-env-vars = {
     K8S_HOST      = var.k8s-host
-    K8S_CA        = var.k8s-ca
     DOCKER_IMAGES = join(",", local.known-docker-images)
   }
   bucket = "${var.folder-id}-fn-deploy"
@@ -37,6 +36,19 @@ resource "yandex_function" "alice-api" {
   environment        = local.app-env-vars
   service_account_id = yandex_iam_service_account.app-sa.id
   execution_timeout  = "3"
+  secrets {
+    id                   = data.yandex_lockbox_secret.k8s_secrets.id
+    version_id           = data.yandex_lockbox_secret.k8s_secrets.current_version[0].id
+    key                  = "SA_KEY"
+    environment_variable = "SA_KEY"
+  }
+  secrets {
+    id                   = data.yandex_lockbox_secret.k8s_secrets.id
+    version_id           = data.yandex_lockbox_secret.k8s_secrets.current_version[0].id
+    key                  = "CA"
+    environment_variable = "K8S_CA"
+  }
+  depends_on = [yandex_resourcemanager_folder_iam_binding.app-read-secrets]
 }
 
 resource "yandex_iam_service_account" "app-sa" {
@@ -55,6 +67,14 @@ resource "yandex_resourcemanager_folder_iam_binding" "app-k8s-access" {
     "serviceAccount:${yandex_iam_service_account.app-sa.id}"
   ]
   role = "k8s.cluster-api.editor"
+}
+
+resource "yandex_resourcemanager_folder_iam_binding" "app-read-secrets" {
+  folder_id = var.folder-id
+  members   = [
+    "serviceAccount:${yandex_iam_service_account.app-sa.id}"
+  ]
+  role = "lockbox.payloadViewer"
 }
 
 resource "yandex_iam_service_account" "func-deployer" {
@@ -90,6 +110,9 @@ resource "yandex_storage_object" "fn-sources" {
   #  source = data.archive_file.app-code.output_path
 }
 
+data "yandex_lockbox_secret" "k8s_secrets" {
+  secret_id = var.k8s-secrets
+}
 # output
 
 output "function-alice-id" {
@@ -123,6 +146,6 @@ variable "k8s-host" {
   type = string
 }
 
-variable "k8s-ca" {
+variable "k8s-secrets" {
   type = string
 }

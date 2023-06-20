@@ -9,10 +9,66 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/avhaliullin/yandex-alice-k8s-skill/app/config"
 	ycsdk "github.com/yandex-cloud/go-sdk"
+	"github.com/yandex-cloud/go-sdk/iamkey"
 )
 
+type Deps interface {
+	GetConfig() *config.Config
+}
+
+func New(deps Deps) (Service, error) {
+	conf := deps.GetConfig()
+	if len(conf.SAKey) > 0 {
+		return NewStaticKeyBytes([]byte(conf.SAKey))
+	} else {
+		return NewMetadata()
+	}
+}
+
 var _ Service = &metadata{}
+
+type sdkAuth struct {
+	sdk *ycsdk.SDK
+}
+
+func NewStaticKeyBytes(keyJSON []byte) (Service, error) {
+	key, err := iamkey.ReadFromJSONBytes(keyJSON)
+	if err != nil {
+		return nil, err
+	}
+	return newStaticKey(key)
+}
+
+func NewStaticKeyPath(path string) (Service, error) {
+	key, err := iamkey.ReadFromJSONFile(path)
+	if err != nil {
+		return nil, err
+	}
+	return newStaticKey(key)
+}
+func newStaticKey(key *iamkey.Key) (Service, error) {
+	creds, err := ycsdk.ServiceAccountKey(key)
+	if err != nil {
+		return nil, err
+	}
+	sdk, err := ycsdk.Build(context.Background(), ycsdk.Config{
+		Credentials: creds,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &sdkAuth{sdk: sdk}, nil
+}
+
+func (s *sdkAuth) GetToken(ctx context.Context) (string, error) {
+	resp, err := s.sdk.CreateIAMToken(ctx)
+	if err != nil {
+		return "", err
+	}
+	return resp.GetIamToken(), nil
+}
 
 type metadata struct {
 	creds ycsdk.NonExchangeableCredentials
