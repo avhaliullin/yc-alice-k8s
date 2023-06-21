@@ -20,14 +20,14 @@ const (
 )
 
 type StateData struct {
-	State       State
-	Image       string
-	ImageID     string
-	Scale       int
-	DeployName  string
-	DeployID    string
-	Namespace   string
-	NamespaceID string
+	State       State  `json:",omitempty"`
+	Image       string `json:",omitempty"`
+	ImageID     string `json:",omitempty"`
+	Scale       int    `json:",omitempty"`
+	DeployName  string `json:",omitempty"`
+	DeployID    string `json:",omitempty"`
+	Namespace   string `json:",omitempty"`
+	NamespaceID string `json:",omitempty"`
 }
 
 func (s *StateData) GetState() State {

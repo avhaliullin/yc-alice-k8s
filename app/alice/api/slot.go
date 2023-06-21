@@ -1,9 +1,9 @@
 package api
 
 type Slot struct {
-	Type   string      `json:"type"`
-	Tokens *TokensRef  `json:"tokens"`
-	Value  interface{} `json:"value"`
+	Type   string      `json:"type,omitempty"`
+	Tokens *TokensRef  `json:"tokens,omitempty"`
+	Value  interface{} `json:"value,omitempty"`
 }
 
 func (s *Slot) AsString() (string, bool) {

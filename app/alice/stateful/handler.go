@@ -2,7 +2,6 @@ package stateful
 
 import (
 	"context"
-	"fmt"
 
 	aliceapi "github.com/avhaliullin/yandex-alice-k8s-skill/app/alice/api"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/alice/cache"
@@ -35,12 +34,16 @@ func (h *Handler) Handle(ctx context.Context, req *aliceapi.Request) (*aliceapi.
 	sessionID := req.Session.SessionID
 	ctx = log.CtxWithLogger(ctx, h.logger.With(zap.String("sessionID", string(sessionID))))
 	ctx = cache.ContextWithCache(ctx)
-	log.Info(ctx, fmt.Sprintf("request: %s", mustToJSON(req)))
 	resp, err := h.handle(ctx, req)
 	if err != nil {
 		return h.reportError(ctx, err)
 	}
 	resp.Version = req.Version
+	log.Info(ctx, "request processed",
+		log.FieldJSON("req", req),
+		log.FieldJSON("resp", resp),
+		zap.String("kind", "access-log"),
+	)
 	return resp, nil
 }
 

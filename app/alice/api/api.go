@@ -5,27 +5,27 @@ import (
 )
 
 type Request struct {
-	Version                string    `json:"version"`
-	Session                Session   `json:"session"`
-	Request                *Req      `json:"request"`
-	AccountLinkingComplete *EmptyObj `json:"account_linking_complete_event"`
-	State                  ReqState  `json:"state"`
+	Version                string    `json:"version,omitempty"`
+	Session                Session   `json:"session,omitempty"`
+	Request                *Req      `json:"request,omitempty"`
+	AccountLinkingComplete *EmptyObj `json:"account_linking_complete_event,omitempty"`
+	State                  ReqState  `json:"state,omitempty"`
 }
 
 type ReqState struct {
-	Session StateData `json:"session"`
+	Session StateData `json:"session,omitempty"`
 }
 
 type Session struct {
-	MessageID int                  `json:"message_id"`
-	SessionID model.AliceSessionID `json:"session_id"`
-	User      *User                `json:"user"`
+	MessageID int                  `json:"message_id,omitempty"`
+	SessionID model.AliceSessionID `json:"session_id,omitempty"`
+	User      *User                `json:"user,omitempty"`
 	New       bool                 `json:"new"`
 }
 
 type User struct {
-	ID    string `json:"user_id"`
-	Token string `json:"access_token"`
+	ID    string `json:"user_id,omitempty"`
+	Token string `json:"access_token,omitempty"`
 }
 
 type RequestType string
@@ -36,43 +36,43 @@ const (
 )
 
 type Req struct {
-	Command           string         `json:"command"`
-	OriginalUtterance string         `json:"original_utterance"`
-	NLU               NLU            `json:"nlu"`
-	Type              RequestType    `json:"type"`
-	Payload           *ButtonPayload `json:"payload"`
+	Command           string         `json:"command,omitempty"`
+	OriginalUtterance string         `json:"original_utterance,omitempty"`
+	NLU               NLU            `json:"nlu,omitempty"`
+	Type              RequestType    `json:"type,omitempty"`
+	Payload           *ButtonPayload `json:"payload,omitempty"`
 }
 
 type NLU struct {
-	Tokens   []string `json:"tokens"`
-	Intents  Intents  `json:"intents"`
-	Entities []Slot   `json:"entities"`
+	Tokens   []string `json:"tokens,omitempty"`
+	Intents  Intents  `json:"intents,omitempty"`
+	Entities []Slot   `json:"entities,omitempty"`
 }
 
 type TokensRef struct {
-	Start int `json:"start"`
-	End   int `json:"end"`
+	Start int `json:"start,omitempty"`
+	End   int `json:"end,omitempty"`
 }
 
 type Resp struct {
-	Text       string    `json:"text"`
-	TTS        string    `json:"tts"`
-	Buttons    []*Button `json:"buttons"`
+	Text       string    `json:"text,omitempty"`
+	TTS        string    `json:"tts,omitempty"`
+	Buttons    []*Button `json:"buttons,omitempty"`
 	EndSession bool      `json:"end_session"`
 }
 
 type Button struct {
-	Title   string         `json:"title"`
-	Payload *ButtonPayload `json:"payload"`
+	Title   string         `json:"title,omitempty"`
+	Payload *ButtonPayload `json:"payload,omitempty"`
 	URL     string         `json:"url,omitempty"`
 	Hide    bool           `json:"hide"`
 }
 
 type Response struct {
-	Version             string     `json:"version"`
-	Response            *Resp      `json:"response"`
-	StartAccountLinking *EmptyObj  `json:"start_account_linking"`
-	State               *StateData `json:"session_state"`
+	Version             string     `json:"version,omitempty"`
+	Response            *Resp      `json:"response,omitempty"`
+	StartAccountLinking *EmptyObj  `json:"start_account_linking,omitempty"`
+	State               *StateData `json:"session_state,omitempty"`
 }
 
 func (r *Response) WithState(s *StateData) *Response {
@@ -81,11 +81,6 @@ func (r *Response) WithState(s *StateData) *Response {
 }
 
 type ButtonPayload struct {
-	//ChooseListID   model.TODOListID `json:"choose_list_id,omitempty"`
-	ChooseListName string `json:"choose_list_name,omitempty"`
-	CreateList     bool   `json:"create_list,omitempty"`
-	ChooseItemText string `json:"choose_item_text,omitempty"`
-	//ChooseItemID   model.ListItemID `json:"choose_item_id,omitempty"`
 }
 
 type EmptyObj struct {

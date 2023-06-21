@@ -5,12 +5,10 @@ package k8s
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/errors"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/log"
-	"go.uber.org/zap"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -54,7 +52,7 @@ func (s *service) ListDeployments(ctx context.Context, req *ListDeploymentsReq) 
 	if err != nil {
 		return nil, errors.NewInternal(err)
 	}
-	log.Info(ctx, "list deployments", zapJSON("req", req), zapJSON("resp", resp))
+	log.Info(ctx, "list deployments", log.FieldJSON("req", req), log.FieldJSON("resp", resp))
 	//TODO(paging)
 	return resp.Items, nil
 }
@@ -87,7 +85,7 @@ func (s *service) ListNamespaces(ctx context.Context, req *ListNamespacesReq) ([
 	if err != nil {
 		return nil, errors.NewInternal(err)
 	}
-	log.Info(ctx, "list namespaces", zapJSON("req", req), zapJSON("resp", resp))
+	log.Info(ctx, "list namespaces", log.FieldJSON("req", req), log.FieldJSON("resp", resp))
 	//TODO(pagination?)
 	res := make([]string, len(resp.Items))[:0]
 	for _, ns := range resp.Items {
@@ -101,7 +99,7 @@ func (s *service) CountPods(ctx context.Context, req *CountPodsReq) (int, errors
 	if err != nil {
 		return 0, errors.NewInternal(err)
 	}
-	log.Info(ctx, "count pods", zapJSON("req", req), zapJSON("resp", resp))
+	log.Info(ctx, "count pods", log.FieldJSON("req", req), log.FieldJSON("resp", resp))
 	//TODO(pagination?)
 	return len(resp.Items), nil
 }
@@ -111,7 +109,7 @@ func (s *service) GetPodStatuses(ctx context.Context, req *PodStatusesReq) (*Pod
 	if err != nil {
 		return nil, errors.NewInternal(err)
 	}
-	log.Info(ctx, "get pod statuses", zapJSON("req", req), zapJSON("resp", resp))
+	log.Info(ctx, "get pod statuses", log.FieldJSON("req", req), log.FieldJSON("resp", resp))
 	//TODO(pagination)
 	var result PodStatusesResp
 	for _, pod := range resp.Items {
@@ -134,7 +132,7 @@ func (s *service) GetPodStatuses(ctx context.Context, req *PodStatusesReq) (*Pod
 func (s *service) ListServices(ctx context.Context, req *ListServicesReq) ([]string, errors.Err) {
 	resp, err := s.client.CoreV1().Services(req.Namespace).List(ctx, metav1.ListOptions{})
 	//TODO(pagination)
-	log.Info(ctx, "list services", zapJSON("req", req), zapJSON("resp", resp))
+	log.Info(ctx, "list services", log.FieldJSON("req", req), log.FieldJSON("resp", resp))
 	if err != nil {
 		return nil, errors.NewInternal(err)
 	}
@@ -186,22 +184,6 @@ func (s *service) Deploy(ctx context.Context, req *DeployReq) errors.Err {
 		return errors.NewInternal(err)
 	}
 	return nil
-}
-
-func zapJSON(key string, value any) zap.Field {
-	return zap.Reflect(key, &jsonObjMarshaller{obj: value})
-}
-
-type jsonObjMarshaller struct {
-	obj any
-}
-
-func (j *jsonObjMarshaller) MarshalJSON() ([]byte, error) {
-	bytes, err := json.Marshal(j.obj)
-	if err != nil {
-		return nil, fmt.Errorf("json marshaling failed: %w", err)
-	}
-	return bytes, nil
 }
 
 func int32Ptr(i int32) *int32 { return &i }
