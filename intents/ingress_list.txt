@@ -1,6 +1,6 @@
 root:
     %lemma
-    (какие есть ингрессы|какие ингрессы есть|перечисли ингрессы) в (${NAMESPACE_ADPOS})? $Namespace
+    (какие есть ингрессы|какие ингрессы есть|перечисли ингрессы) (в (${NAMESPACE_ADPOS})? $Namespace)?
 
 slots:
     namespace:

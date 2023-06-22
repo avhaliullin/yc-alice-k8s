@@ -20,8 +20,20 @@ func (h *Handler) brokenPods(ctx context.Context, req *aliceapi.Request) (*alice
 
 	namespaceName, ok := intnt.Slots.Namespace.AsString()
 	if !ok {
-		return resp.AskNSForBrokenPods(), nil
+		return resp.AskNSForBrokenPods().
+			WithState(&aliceapi.StateData{State: aliceapi.StateBrokenPodsReqNS}), nil
 	}
+	return h.doBrokenPods(ctx, namespaceName)
+}
+
+func (h *Handler) brokenPodsReqNs(ctx context.Context, req *aliceapi.Request) (*aliceapi.Response, errors.Err) {
+	if req.Request.Type != aliceapi.RequestTypeSimple {
+		return nil, nil
+	}
+	return h.doBrokenPods(ctx, req.Request.OriginalUtterance)
+}
+
+func (h *Handler) doBrokenPods(ctx context.Context, namespaceName string) (*aliceapi.Response, errors.Err) {
 	namespace, err := h.findNamespaceByName(ctx, namespaceName)
 	if err != nil {
 		return nil, err

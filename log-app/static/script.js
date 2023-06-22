@@ -82,7 +82,11 @@ function renderRequestMessage(req) {
     const props = [createProperty("request", trimStr(req.request.original_utterance, 100))];
     const intents = req.request.nlu.intents;
     for (const intentName in intents) {
-        const intentProp = createProperty("intent", intentName);
+        let renderName = intentName;
+        if (renderName.startsWith("easter")) {
+            renderName += " " + String.fromCodePoint(0x1F31F);
+        }
+        const intentProp = createProperty("intent", renderName);
         props.push(intentProp)
 
         const intentSlots = intents[intentName].slots;
@@ -94,9 +98,6 @@ function renderRequestMessage(req) {
             intentProp.items.push(createProperty(slotKey, slotValue));
         }
     }
-    // if (hasFields(req.state.session)) {
-    //     props.push(renderState(req.state.session));
-    // }
     return renderMessage(props);
 }
 
@@ -116,12 +117,20 @@ function stateName(stateId) {
             return "Scaling deploy, requested for deploy name";
         case "SCL_DPLY_REQ_SCALE":
             return "Scaling deploy, requested for new replicas count";
-        case "SCL_DPLY_REQ_CONFIRM":
+        case "SCL_DPLY_REQ_CNFRM":
             return "Scaling deploy, confirmation requested";
         case "DEL_DPLY_REQ_NAME":
             return "Deleting deploy, deploy name requested";
         case "DEL_DPLY_REQ_CNFRM":
             return "Deleting deploy, confirmation requested";
+        case "BRKN_PD_REQ_NS":
+            return "Checking broken pods, requested for namespace"
+        case "CNT_PD_REQ_NS":
+            return "Counting pods, requested for namespace"
+        case "LST_INGRS_REQ_NS":
+            return "Listing ingresses, requested for namespace"
+        case "LST_SRVC_REQ_NS":
+            return "Listing services, requested for namespace"
     }
     return stateId;
 }

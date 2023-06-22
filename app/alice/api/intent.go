@@ -15,6 +15,7 @@ type Intents struct {
 	EasterDBLaunch  *EmptyObj `json:"easter_db_launch,omitempty"`
 	EasterWhatIsK8s *EmptyObj `json:"easter_what_is_k8s,omitempty"`
 	EasterHowTo     *EmptyObj `json:"easter_how_to,omitempty"`
+	LetsPlayK8S     *EmptyObj `json:"lets_play_k8s,omitempty"`
 
 	Confirm *EmptyObj `json:"YANDEX.CONFIRM,omitempty"`
 	Cancel  *EmptyObj `json:"cancel,omitempty"`

@@ -20,8 +20,20 @@ func (h *Handler) listServices(ctx context.Context, req *aliceapi.Request) (*ali
 
 	namespaceName, ok := intnt.Slots.Namespace.AsString()
 	if !ok {
-		return resp.AskNSForServiceList(), nil
+		return resp.AskNSForServiceList().
+			WithState(&aliceapi.StateData{State: aliceapi.StateServiceListReqNS}), nil
 	}
+	return h.doListServices(ctx, namespaceName)
+}
+
+func (h *Handler) listServicesReqNs(ctx context.Context, req *aliceapi.Request) (*aliceapi.Response, errors.Err) {
+	if req.Request.Type != aliceapi.RequestTypeSimple {
+		return nil, nil
+	}
+	return h.doListServices(ctx, req.Request.OriginalUtterance)
+}
+
+func (h *Handler) doListServices(ctx context.Context, namespaceName string) (*aliceapi.Response, errors.Err) {
 	namespace, err := h.findNamespaceByName(ctx, namespaceName)
 	if err != nil {
 		return nil, err

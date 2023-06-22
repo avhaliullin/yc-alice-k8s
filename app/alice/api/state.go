@@ -17,6 +17,11 @@ const (
 
 	StateDeleteDeployReqName    State = "DEL_DPLY_REQ_NAME"
 	StateDeleteDeployReqConfirm State = "DEL_DPLY_REQ_CNFRM"
+
+	StateBrokenPodsReqNS  State = "BRKN_PD_REQ_NS"
+	StateCountPodsReqNS   State = "CNT_PD_REQ_NS"
+	StateIngressListReqNS State = "LST_INGRS_REQ_NS"
+	StateServiceListReqNS State = "LST_SRVC_REQ_NS"
 )
 
 type StateData struct {

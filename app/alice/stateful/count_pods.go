@@ -20,8 +20,20 @@ func (h *Handler) countPods(ctx context.Context, req *aliceapi.Request) (*alicea
 
 	namespaceName, ok := intnt.Slots.Namespace.AsString()
 	if !ok {
-		return resp.AskNSForCountingPods(), nil
+		return resp.AskNSForCountingPods().
+			WithState(&aliceapi.StateData{State: aliceapi.StateCountPodsReqNS}), nil
 	}
+	return h.doCountPods(ctx, namespaceName)
+}
+
+func (h *Handler) countPodsReqNs(ctx context.Context, req *aliceapi.Request) (*aliceapi.Response, errors.Err) {
+	if req.Request.Type != aliceapi.RequestTypeSimple {
+		return nil, nil
+	}
+	return h.doCountPods(ctx, req.Request.OriginalUtterance)
+}
+
+func (h *Handler) doCountPods(ctx context.Context, namespaceName string) (*aliceapi.Response, errors.Err) {
 	namespace, err := h.findNamespaceByName(ctx, namespaceName)
 	if err != nil {
 		return nil, err

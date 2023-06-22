@@ -20,8 +20,20 @@ func (h *Handler) listIngresses(ctx context.Context, req *aliceapi.Request) (*al
 
 	namespaceName, ok := intnt.Slots.Namespace.AsString()
 	if !ok {
-		return resp.AskNSForIngresses(), nil
+		return resp.AskNSForIngresses().
+			WithState(&aliceapi.StateData{State: aliceapi.StateIngressListReqNS}), nil
 	}
+	return h.doListIngresses(ctx, namespaceName)
+}
+
+func (h *Handler) listIngressesReqNs(ctx context.Context, req *aliceapi.Request) (*aliceapi.Response, errors.Err) {
+	if req.Request.Type != aliceapi.RequestTypeSimple {
+		return nil, nil
+	}
+	return h.doListIngresses(ctx, req.Request.OriginalUtterance)
+}
+
+func (h *Handler) doListIngresses(ctx context.Context, namespaceName string) (*aliceapi.Response, errors.Err) {
 	namespace, err := h.findNamespaceByName(ctx, namespaceName)
 	if err != nil {
 		return nil, err
