@@ -19,5 +19,5 @@ func (h *Handler) letsPlayK8S(ctx context.Context, req *aliceapi.Request) (*alic
 	if intnt == nil {
 		return nil, nil
 	}
-	return resp.ScenarioDiscovery(), nil
+	return resp.LetsPlayK8S(), nil
 }

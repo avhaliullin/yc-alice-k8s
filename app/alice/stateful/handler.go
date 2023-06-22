@@ -5,6 +5,7 @@ import (
 
 	aliceapi "github.com/avhaliullin/yandex-alice-k8s-skill/app/alice/api"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/alice/cache"
+	"github.com/avhaliullin/yandex-alice-k8s-skill/app/alice/text/resp"
 	docker_hub "github.com/avhaliullin/yandex-alice-k8s-skill/app/docker-hub"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/errors"
 	"github.com/avhaliullin/yandex-alice-k8s-skill/app/k8s"
@@ -49,16 +50,12 @@ func (h *Handler) Handle(ctx context.Context, req *aliceapi.Request) (*aliceapi.
 
 func (h *Handler) handle(ctx context.Context, req *aliceapi.Request) (*aliceapi.Response, errors.Err) {
 	if req.Session.New || req.AccountLinkingComplete != nil {
-		return &aliceapi.Response{Response: &aliceapi.Resp{
-			Text: "Давайте разберемся с вашим кубером!",
-		}}, nil
+		return resp.WelcomePhrase(), nil
 	}
 	if state := req.State.Session; state.State != aliceapi.StateInit {
 		intents := req.Request.NLU.Intents
 		if req.Request.Type == aliceapi.RequestTypeSimple && intents.Cancel != nil {
-			return &aliceapi.Response{
-				Response: &aliceapi.Resp{Text: "Окей, отменяю. Чем я могу помочь?"},
-			}, nil
+			return resp.RejectOnWizard(), nil
 		}
 		scenario, ok := h.stateScenarios[state.State]
 		if ok {
@@ -80,9 +77,7 @@ func (h *Handler) handle(ctx context.Context, req *aliceapi.Request) (*aliceapi.
 			return resp, err
 		}
 	}
-	return &aliceapi.Response{Response: &aliceapi.Resp{
-		Text: "Я вас не поняла",
-	}}, nil
+	return resp.UnrecognizedRequest(), nil
 }
 
 func (h *Handler) reportError(ctx context.Context, err errors.Err) (*aliceapi.Response, error) {

@@ -38,5 +38,6 @@ func (h *Handler) setupScenarios() {
 		h.deployStatusFromScratch,
 		h.scaleDeployFromScratch,
 		h.deleteDeployFromScratch,
+		h.letsPlayK8S,
 	}
 }

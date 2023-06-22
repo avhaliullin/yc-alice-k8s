@@ -54,6 +54,7 @@ func RejectOnWizard() *aliceapi.Response {
 	return randomize(
 		format("Хорошо, отменяю, давайте попробуем что-нибудь еще"),
 		format("Отменяю"),
+		format("Окей, отменяю. Чем я могу помочь?"),
 	)()
 }
 
@@ -305,5 +306,20 @@ func LetsPlayK8S() *aliceapi.Response {
 			format("Обязательно! "),
 		),
 		discoveryBase(),
+	)()
+}
+
+func WelcomePhrase() *aliceapi.Response {
+	return randomize(
+		format("Давайте разберемся с вашим кубером!"),
+		format("Руки чешутся чего-нибудь подепл+оить!"),
+	)()
+}
+
+func UnrecognizedRequest() *aliceapi.Response {
+	return randomize(
+		format("Я вас не поняла"),
+		format("Извините, не понимаю"),
+		format("Я ничего не поняла, но могу рассказать вам, что я умею"),
 	)()
 }
