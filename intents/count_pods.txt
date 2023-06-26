@@ -1,6 +1,6 @@
 root:
     %lemma
-    (сколько подов|посчитай поды) запущено? в (${NAMESPACE_ADPOS})? $Namespace?
+    (сколько кодов|сколько подов|посчитай поды|посчитай коды) запущено? в (${NAMESPACE_ADPOS})? $Namespace?
 
 slots:
     namespace:

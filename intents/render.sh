@@ -1,11 +1,11 @@
 #!/bin/bash
 
-export NAMESPACE="неймспейс|нейм спейс|нам спейс|namespace|name space"
-export NAMESPACE_GEN="неймспейса|нейм спейса|нам спейса|namespace|name space"
-export NAMESPACE_ADPOS="неймспейсе|нейм спейсе|нам спейсе|namespace|name space"
-export NAMESPACE_PLUR="неймспейсы|нейм спейсы|нам спейсы|namespace|name space"
-export NAMESPACE_GEN_PLUR="неймспейсов|нейм спейсов|нам спейсов|namespace|name space"
-export K8S="кубернетис|купернетис|кубер|к8с"
+export NAMESPACE="эмспейс|неймспейс|нейм спейс|нам спейс|namespace|name space"
+export NAMESPACE_GEN="эмспейса|неймспейса|нейм спейса|нам спейса|namespace|name space"
+export NAMESPACE_ADPOS="эмспейсе|неймспейсе|нейм спейсе|нам спейсе|namespace|name space"
+export NAMESPACE_PLUR="эмспейсы|неймспейсы|нейм спейсы|нам спейсы|namespace|name space"
+export NAMESPACE_GEN_PLUR="эмспейсов|неймспейсов|нейм спейсов|нам спейсов|namespace|name space"
+export K8S="кубернетис|купернетис|кубер|к8с|купер"
 export DEPLOY="дипло|деплой|диплой|диплей|деплоймент|диплоймент|диплеймент|диплоймант"
 export DEPLOY_GEN="деплоя|диплоя|диплея|деплоймента|диплоймента|диплеймента|диплойманта"
 export DEPLOY_ADPOS="деплое|диплое|диплее|деплойменте|диплойменте|диплейменте|диплойманте"

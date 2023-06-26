@@ -4,9 +4,12 @@
 package resp
 
 import (
+	"fmt"
+	"math/rand"
 	"strings"
 
 	aliceapi "github.com/avhaliullin/yandex-alice-k8s-skill/app/alice/api"
+	"github.com/avhaliullin/yandex-alice-k8s-skill/app/k8s"
 )
 
 func AskNSForBrokenPods() *aliceapi.Response {
@@ -28,13 +31,29 @@ func NSNotFound(ns string) *aliceapi.Response {
 	)()
 }
 
-func BrokenPodsInNS(ns string, brokenPods int) *aliceapi.Response {
-	return numDependent(brokenPods, numDependentConfig{
+func BrokenPodsInNS(ns string, statuses *k8s.PodStatusesResp) *aliceapi.Response {
+	brokenPods := statuses.Failed
+	resp := numDependent(brokenPods, numDependentConfig{
 		exactly0: format("В нэймсп+эйсе \"%s\" нет сломанных п+одов", ns),
 		like1:    format("В нэймсп+эйсе \"%s\" %d сломанный под", ns, brokenPods),
 		like2:    format("В нэймсп+эйсе \"%s\" %d сломанных п+ода", ns, brokenPods),
 		like5:    format("В нэймсп+эйсе \"%s\" %d сломанных п+одов", ns, brokenPods),
-	})()
+	})
+	running := statuses.Succeeded + statuses.Running
+	if running > 0 {
+		resp = concat(resp,
+			numDependent(running,
+				numDependentConfig{
+					like1: format(", %d п+од запущен", running),
+					like2: format(", %d п+ода запущено", running),
+					like5: format(", %d п+одов запущено", running),
+				},
+			))
+	}
+	if statuses.Pending > 0 {
+		resp = concat(resp, format(", %d еще в процессе запуска", statuses.Pending))
+	}
+	return resp()
 }
 
 func AskNSForCountingPods() *aliceapi.Response {
@@ -199,7 +218,7 @@ func DeployReplicaStatuses(deploy string, available int, unavailable int) *alice
 	if unavailable > 0 {
 		return concat(
 			numDependent(available, numDependentConfig{
-				exactly0: format("В депл+ое \"%s\" нет доступных реплика, ", deploy),
+				exactly0: format("В депл+ое \"%s\" нет доступных реплик, ", deploy),
 				like1:    format("В депл+ое \"%s\" %d доступная реплика, ", deploy, available),
 				like2:    format("В депл+ое \"%s\" %d доступные реплики, ", deploy, available),
 				like5:    format("В депл+ое \"%s\" %d доступных реплик, ", deploy, available),
@@ -214,9 +233,9 @@ func DeployReplicaStatuses(deploy string, available int, unavailable int) *alice
 	return numDependent(available, numDependentConfig{
 		exactly1: format("Единственная реплика в депл+ое \"%s\" уже доступна", deploy),
 		exactly2: format("Обе реплики в депл+ое \"%s\" доступны", deploy),
-		like1:    format("%d реплика уже доступна в деплое \"%s\"", available, deploy),
-		like2:    format("Все %d реплики уже доступны в деплое \"%s\"", available, deploy),
-		like5:    format("Все %d реплик уже доступны в деплое \"%s\"", available, deploy),
+		like1:    format("%d реплика уже доступна в депл+ое \"%s\"", available, deploy),
+		like2:    format("Все %d реплики уже доступны в депл+ое \"%s\"", available, deploy),
+		like5:    format("Все %d реплик уже доступны в депл+ое \"%s\"", available, deploy),
 	})()
 }
 
@@ -231,12 +250,12 @@ func ListIngresses(ns string, ingressList []string) *aliceapi.Response {
 	if len(ingressList) == 0 {
 		return format("В нэймсп+эйсе \"%s\" нет ингр+эссов", ns)()
 	}
-	ingressListStr := strings.Join(ingressList, "\n")
+	ingressListStr := joinItemsList(ingressList)
 	return numDependent(len(ingressListStr), numDependentConfig{
-		exactly1: format("В нэймсп+эйсе \"%s\" есть только ингр+эсс \"%s\"", ns, ingressListStr),
-		like1:    format("В нэймсп+эйсе \"%s\" %d ингр+эсс: \"%s\"", ns, len(ingressList), ingressListStr),
-		like2:    format("В нэймсп+эйсе \"%s\" %d ингр+эсса: \"%s\"", ns, len(ingressList), ingressListStr),
-		like5:    format("В нэймсп+эйсе \"%s\" %d ингр+эссов: \"%s\"", ns, len(ingressList), ingressListStr),
+		exactly1: format("В нэймсп+эйсе \"%s\" есть только ингр+эсс %s", ns, ingressListStr),
+		like1:    format("В нэймсп+эйсе \"%s\" %d ингр+эсс: %s", ns, len(ingressList), ingressListStr),
+		like2:    format("В нэймсп+эйсе \"%s\" %d ингр+эсса: %s", ns, len(ingressList), ingressListStr),
+		like5:    format("В нэймсп+эйсе \"%s\" %d ингр+эссов: %s", ns, len(ingressList), ingressListStr),
 	})()
 }
 
@@ -244,21 +263,21 @@ func ListServices(ns string, serviceList []string) *aliceapi.Response {
 	if len(serviceList) == 0 {
 		return format("В нэймсп+эйсе \"%s\" нет сервисов", ns)()
 	}
-	serviceListStr := strings.Join(serviceList, "\n")
+	serviceListStr := joinItemsList(serviceList)
 	return numDependent(len(serviceListStr), numDependentConfig{
-		exactly1: format("В нэймсп+эйсе \"%s\" есть только сервис \"%s\"", ns, serviceListStr),
-		like1:    format("В нэймсп+эйсе \"%s\" %d сервис: \"%s\"", ns, len(serviceList), serviceListStr),
-		like2:    format("В нэймсп+эйсе \"%s\" %d сервиса: \"%s\"", ns, len(serviceList), serviceListStr),
-		like5:    format("В нэймсп+эйсе \"%s\" %d сервисов: \"%s\"", ns, len(serviceList), serviceListStr),
+		exactly1: format("В нэймсп+эйсе \"%s\" есть только сервис %s", ns, serviceListStr),
+		like1:    format("В нэймсп+эйсе \"%s\" %d сервис: %s", ns, len(serviceList), serviceListStr),
+		like2:    format("В нэймсп+эйсе \"%s\" %d сервиса: %s", ns, len(serviceList), serviceListStr),
+		like5:    format("В нэймсп+эйсе \"%s\" %d сервисов: %s", ns, len(serviceList), serviceListStr),
 	})()
 }
 
 func ListNSs(nss []string) *aliceapi.Response {
-	nssString := strings.Join(nss, "\n")
+	nssString := joinItemsList(nss)
 	return numDependent(len(nss), numDependentConfig{
-		like1: format("Я нашла %d нэймсп+эйс: \"%s\"", len(nss), nssString),
-		like2: format("Я нашла %d нэймсп+эйса: \"%s\"", len(nss), nssString),
-		like5: format("Я нашла %d нэймсп+эйсов: \"%s\"", len(nss), nssString),
+		like1: format("Я нашла %d нэймсп+эйс: %s", len(nss), nssString),
+		like2: format("Я нашла %d нэймсп+эйса: %s", len(nss), nssString),
+		like5: format("Я нашла %d нэймсп+эйсов: %s", len(nss), nssString),
 	})()
 }
 
@@ -274,7 +293,7 @@ func ExpectedNumber() *aliceapi.Response {
 }
 
 func EasterDBLaunch() *aliceapi.Response {
-	return format("Если у вас возникает такой вопрос - то нет")()
+	return format("Если у вас возникает такой вопрос — то нет")()
 }
 
 func EasterHowTo() *aliceapi.Response {
@@ -282,7 +301,11 @@ func EasterHowTo() *aliceapi.Response {
 }
 
 func EasterWhatIsK8s() *aliceapi.Response {
-	return format("Куберн+этис - это пять бинар+ей")()
+	return format("Куберн+этис — это пять бинар+ей")()
+}
+
+func EasterHowYouMade() *aliceapi.Response {
+	return format("Немного бесс+ерверных вычислений и очень, очень, очень много +ифов")()
 }
 
 func NoDeploymentsInNS(ns string) *aliceapi.Response {
@@ -321,5 +344,31 @@ func UnrecognizedRequest() *aliceapi.Response {
 		format("Я вас не поняла"),
 		format("Извините, не понимаю"),
 		format("Я ничего не поняла, но могу рассказать вам, что я умею"),
+		format("А какую задачу мы решаем?"),
+		format("Непонятно. Так-то я искусственный интеллект, а адм+иню так, для души"),
 	)()
+}
+
+func joinItemsList(items []string) string {
+	trimmed := false
+	if len(items) > 5 {
+		rand.Shuffle(len(items), func(i, j int) {
+			x := items[i]
+			items[i] = items[j]
+			items[j] = x
+		})
+		items = items[:5]
+		trimmed = true
+	}
+	result := ""
+	for _, item := range items {
+		if len(result) > 0 {
+			result += ", "
+		}
+		result += fmt.Sprintf("\"%s\"", item)
+	}
+	if trimmed {
+		result += " и другие"
+	}
+	return result
 }

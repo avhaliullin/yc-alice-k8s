@@ -19,6 +19,8 @@ func (h *Handler) easterEggs(ctx context.Context, req *aliceapi.Request) (*alice
 		return resp.EasterHowTo(), nil
 	} else if intents.EasterWhatIsK8s != nil {
 		return resp.EasterWhatIsK8s(), nil
+	} else if intents.HowYouMade != nil {
+		return resp.EasterHowYouMade(), nil
 	}
 	return nil, nil
 }

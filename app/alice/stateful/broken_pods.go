@@ -45,6 +45,5 @@ func (h *Handler) doBrokenPods(ctx context.Context, namespaceName string) (*alic
 	if err != nil {
 		return nil, err
 	}
-	brokenCnt := statuses.Failed + statuses.Unknown
-	return resp.BrokenPodsInNS(namespace, brokenCnt), nil
+	return resp.BrokenPodsInNS(namespace, statuses), nil
 }
